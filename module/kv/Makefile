@@ -1,0 +1,6 @@
+all:
+	rm -rf test
+	gcc -g -std=gnu11 ../drpc/drpc.pb-c.h  ../drpc/drpc.pb-c.c  ../drpc/drpc.h ../drpc/drpc.c  \
+	../mgmt/mgmt.pb-c.h ../mgmt/mgmt.pb-c.c ../mgmt/mgmt.h  ../mgmt/mgmt.c \
+	../utils/log.h ../utils/log.c \
+	../server/server.c -o test -lprotobuf-c
