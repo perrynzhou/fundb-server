@@ -9,7 +9,7 @@ package server
 import (
 	"encoding/json"
 	"errors"
-	"kylin-oss/drpc/pb"
+	"conf-server/drpc/pb"
 	"math/rand"
 	"net"
 	"sync"

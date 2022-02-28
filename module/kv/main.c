@@ -18,7 +18,6 @@
 #include <errno.h>
 #include "../drpc/drpc.pb-c.h"
 #include "../mgmt/mgmt.pb-c.h"
-#include "../mgmt/mgmt.h"
 #include "../utils/log.h"
 
 #define MAXEVENTS 64

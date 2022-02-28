@@ -3,9 +3,9 @@ package main
 import (
 	"flag"
 	"fmt"
-	"kylin-oss/drpc/pb"
-	"kylin-oss/drpc/server"
-	"kylin-oss/util"
+	"conf-server/drpc/pb"
+	"conf-server/drpc/server"
+	"conf-server/util"
 	"net"
 	"os"
 	"os/signal"
