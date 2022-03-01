@@ -7,14 +7,11 @@
 package server
 
 import (
-	"encoding/json"
-	"errors"
 	"conf-server/drpc/pb"
-	"math/rand"
+	"errors"
 	"net"
 	"sync"
 
-	log "github.com/sirupsen/logrus"
 	"google.golang.org/protobuf/proto"
 )
 
@@ -147,41 +144,16 @@ func NewClientConnection(socket string) *ClientConnection {
 	}
 }
 
-func (c *ClientConnection) IssueCall(call *pb.Call) error {
-	reqCall := pb.Call{}
-	// requestCall.Method = 传递方法名称
-	// requestCall.Body = 具体rpc服务的请求
-	// requestCall.Module =请求的模块
+func (c *ClientConnection) IssueCall(call *pb.Call) (*pb.Response, error) {
 
-	reqCall.Method = 201
-	reqJoinNodeReq := pb.JoinNodeReq{
-		Hosts:  "127.0.0.1",
-		Port:   rand.Int31n(6000),
-		Weight: rand.Int31n(10),
-		State:  "new",
-	}
-	callBytes, err := proto.Marshal(&reqJoinNodeReq)
+	resp, err := c.SendMsg(call)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	reqCall.Body = callBytes
-	rspCall, err := c.SendMsg(&reqCall)
-	if err != nil {
-		return err
-	}
-	resp := &pb.JoinNodeResp{}
-
-	if err := proto.Unmarshal(rspCall.Body, resp); err != nil {
-		return err
-	}
-	respBytes, err := json.Marshal(resp)
-	if err != nil {
-		return err
-	}
-	log.Info("resp=", string(respBytes))
-	return nil
+	return resp, nil
 }
 
+/*
 func (c *ClientConnection) IssueCall_Template() error {
 	reqCall := pb.Call{}
 	// requestCall.Method = 传递方法名称
@@ -217,7 +189,6 @@ func (c *ClientConnection) IssueCall_Template() error {
 	return nil
 }
 
-/*
 func main() {
 	flag.Parse()
 	sigs := make(chan os.Signal, 1)

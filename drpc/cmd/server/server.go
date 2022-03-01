@@ -1,11 +1,11 @@
 package main
 
 import (
+	"conf-server/drpc/kv"
+	"conf-server/drpc/pb"
+	"conf-server/util"
 	"flag"
 	"fmt"
-	"conf-server/drpc/pb"
-	"conf-server/drpc/server"
-	"conf-server/util"
 	"net"
 	"os"
 	"os/signal"
@@ -37,8 +37,8 @@ func main() {
 		log.Fatalf("failed to listen: %v", err)
 	}
 	s := grpc.NewServer()
-	mgmtServer := server.NewMgmtServer(*sockFile)
-	pb.RegisterMgmtSvcServer(s, mgmtServer)
+	kvService := kv.NewKvService(*sockFile)
+	pb.RegisterKvServiceServer(s, kvService)
 	log.Printf("server listening at %v", lis.Addr())
 	go func() {
 		if err := s.Serve(lis); err != nil {

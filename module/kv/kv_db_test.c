@@ -21,6 +21,10 @@ typedef struct
 int main(int argc, char *argv[])
 {
 
+if(argc !=3) {
+  fprintf(stdout,"usage:%s {db_name} {db_path}\n",argv[0]);
+  return -1;
+}
 const  char *schemas_meta[] = {
     "entries",
     "docs",
