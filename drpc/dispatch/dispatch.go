@@ -42,7 +42,7 @@ func (c *ClientConnection) IsConnected() bool {
 	return c.conn != nil
 }
 
-func (c *ClientConnection) sendCall(msg *pb.Call) error {
+func (c *ClientConnection) sendCall(msg *pb.Request) error {
 	// increment sequence every call, always nonzero
 	c.sequence++
 	msg.Sequence = c.sequence
@@ -77,7 +77,7 @@ func (c *ClientConnection) recvResponse() (*pb.Response, error) {
 
 // SendMsg sends a message to the connected dRPC server, and returns the
 // response to the caller.
-func (c *ClientConnection) SendMsg(msg *pb.Call) (*pb.Response, error) {
+func (c *ClientConnection) SendMsg(msg *pb.Request) (*pb.Response, error) {
 	if !c.IsConnected() {
 		return nil, errors.New("dRPC not connected")
 	}
@@ -144,7 +144,7 @@ func NewClientConnection(socket string) *ClientConnection {
 	}
 }
 
-func (c *ClientConnection) IssueCall(call *pb.Call) (*pb.Response, error) {
+func (c *ClientConnection) IssueCall(call *pb.Request) (*pb.Response, error) {
 
 	resp, err := c.SendMsg(call)
 	if err != nil {
@@ -155,7 +155,7 @@ func (c *ClientConnection) IssueCall(call *pb.Call) (*pb.Response, error) {
 
 /*
 func (c *ClientConnection) IssueCall_Template() error {
-	reqCall := pb.Call{}
+	reqCall := pb.Request{}
 	// requestCall.Method = 传递方法名称
 	// requestCall.Body = 具体rpc服务的请求
 	// requestCall.Module =请求的模块

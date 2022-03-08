@@ -1,0 +1,70 @@
+//
+// (C) Copyright 2019-2021 Intel Corporation.
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+
+syntax = "proto3";
+package conf_service;
+option go_package = "../pb";
+
+message CreateSchemaReq {
+	string  name=1;
+	
+}
+message CreateSchemaResp {
+	string name=1;
+	int32   code=2;
+	string  msg=3;
+}
+
+message QuerySchemaReq {
+	string  name=1;
+	
+}
+message QuerySchemaResp {
+	string name=1;
+	repeated string  confs=2;
+}
+
+message DeleteSchemaReq {
+	string  name=1;
+	
+}
+message DeleteSchemaResp {
+	string name=1;
+	string  msg=2;
+}
+
+
+
+message PutConfReq {
+	string schema_name=1;
+	string conf_key=2;
+	string conf_val=3;
+}
+
+message PutConfResp {
+	string schema_name=1;
+	string msg=2;
+}
+
+message GetConfReq {
+	string schema_name=1;
+	string conf_key=2;
+}
+message GetConfResp {
+	string schema_name=1;
+	string conf_key=2;
+	string conf_val=3;
+}
+
+message DeleteConfReq {
+	string schema_name=1;
+	string conf_key=2;
+}
+message DeleteConfResp {
+	string schema_name=1;
+	string conf_key=2;
+	string conf_val=3;
+}

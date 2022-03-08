@@ -7,49 +7,49 @@
 #endif
 
 #include "drpc.pb-c.h"
-void   drpc__call__init
-                     (Drpc__Call         *message)
+void   drpc__request__init
+                     (Drpc__Request         *message)
 {
-  static const Drpc__Call init_value = DRPC__CALL__INIT;
+  static const Drpc__Request init_value = DRPC__REQUEST__INIT;
   *message = init_value;
 }
-size_t drpc__call__get_packed_size
-                     (const Drpc__Call *message)
+size_t drpc__request__get_packed_size
+                     (const Drpc__Request *message)
 {
-  assert(message->base.descriptor == &drpc__call__descriptor);
+  assert(message->base.descriptor == &drpc__request__descriptor);
   return protobuf_c_message_get_packed_size ((const ProtobufCMessage*)(message));
 }
-size_t drpc__call__pack
-                     (const Drpc__Call *message,
+size_t drpc__request__pack
+                     (const Drpc__Request *message,
                       uint8_t       *out)
 {
-  assert(message->base.descriptor == &drpc__call__descriptor);
+  assert(message->base.descriptor == &drpc__request__descriptor);
   return protobuf_c_message_pack ((const ProtobufCMessage*)message, out);
 }
-size_t drpc__call__pack_to_buffer
-                     (const Drpc__Call *message,
+size_t drpc__request__pack_to_buffer
+                     (const Drpc__Request *message,
                       ProtobufCBuffer *buffer)
 {
-  assert(message->base.descriptor == &drpc__call__descriptor);
+  assert(message->base.descriptor == &drpc__request__descriptor);
   return protobuf_c_message_pack_to_buffer ((const ProtobufCMessage*)message, buffer);
 }
-Drpc__Call *
-       drpc__call__unpack
+Drpc__Request *
+       drpc__request__unpack
                      (ProtobufCAllocator  *allocator,
                       size_t               len,
                       const uint8_t       *data)
 {
-  return (Drpc__Call *)
-     protobuf_c_message_unpack (&drpc__call__descriptor,
+  return (Drpc__Request *)
+     protobuf_c_message_unpack (&drpc__request__descriptor,
                                 allocator, len, data);
 }
-void   drpc__call__free_unpacked
-                     (Drpc__Call *message,
+void   drpc__request__free_unpacked
+                     (Drpc__Request *message,
                       ProtobufCAllocator *allocator)
 {
   if(!message)
     return;
-  assert(message->base.descriptor == &drpc__call__descriptor);
+  assert(message->base.descriptor == &drpc__request__descriptor);
   protobuf_c_message_free_unpacked ((ProtobufCMessage*)message, allocator);
 }
 void   drpc__response__init
@@ -97,7 +97,7 @@ void   drpc__response__free_unpacked
   assert(message->base.descriptor == &drpc__response__descriptor);
   protobuf_c_message_free_unpacked ((ProtobufCMessage*)message, allocator);
 }
-static const ProtobufCFieldDescriptor drpc__call__field_descriptors[4] =
+static const ProtobufCFieldDescriptor drpc__request__field_descriptors[4] =
 {
   {
     "module",
@@ -105,7 +105,7 @@ static const ProtobufCFieldDescriptor drpc__call__field_descriptors[4] =
     PROTOBUF_C_LABEL_NONE,
     PROTOBUF_C_TYPE_INT32,
     0,   /* quantifier_offset */
-    offsetof(Drpc__Call, module),
+    offsetof(Drpc__Request, module),
     NULL,
     NULL,
     0,             /* flags */
@@ -117,7 +117,7 @@ static const ProtobufCFieldDescriptor drpc__call__field_descriptors[4] =
     PROTOBUF_C_LABEL_NONE,
     PROTOBUF_C_TYPE_INT32,
     0,   /* quantifier_offset */
-    offsetof(Drpc__Call, method),
+    offsetof(Drpc__Request, method),
     NULL,
     NULL,
     0,             /* flags */
@@ -129,7 +129,7 @@ static const ProtobufCFieldDescriptor drpc__call__field_descriptors[4] =
     PROTOBUF_C_LABEL_NONE,
     PROTOBUF_C_TYPE_INT64,
     0,   /* quantifier_offset */
-    offsetof(Drpc__Call, sequence),
+    offsetof(Drpc__Request, sequence),
     NULL,
     NULL,
     0,             /* flags */
@@ -141,37 +141,37 @@ static const ProtobufCFieldDescriptor drpc__call__field_descriptors[4] =
     PROTOBUF_C_LABEL_NONE,
     PROTOBUF_C_TYPE_BYTES,
     0,   /* quantifier_offset */
-    offsetof(Drpc__Call, body),
+    offsetof(Drpc__Request, body),
     NULL,
     NULL,
     0,             /* flags */
     0,NULL,NULL    /* reserved1,reserved2, etc */
   },
 };
-static const unsigned drpc__call__field_indices_by_name[] = {
+static const unsigned drpc__request__field_indices_by_name[] = {
   3,   /* field[3] = body */
   1,   /* field[1] = method */
   0,   /* field[0] = module */
   2,   /* field[2] = sequence */
 };
-static const ProtobufCIntRange drpc__call__number_ranges[1 + 1] =
+static const ProtobufCIntRange drpc__request__number_ranges[1 + 1] =
 {
   { 1, 0 },
   { 0, 4 }
 };
-const ProtobufCMessageDescriptor drpc__call__descriptor =
+const ProtobufCMessageDescriptor drpc__request__descriptor =
 {
   PROTOBUF_C__MESSAGE_DESCRIPTOR_MAGIC,
-  "drpc.Call",
-  "Call",
-  "Drpc__Call",
+  "drpc.Request",
+  "Request",
+  "Drpc__Request",
   "drpc",
-  sizeof(Drpc__Call),
+  sizeof(Drpc__Request),
   4,
-  drpc__call__field_descriptors,
-  drpc__call__field_indices_by_name,
-  1,  drpc__call__number_ranges,
-  (ProtobufCMessageInit) drpc__call__init,
+  drpc__request__field_descriptors,
+  drpc__request__field_indices_by_name,
+  1,  drpc__request__number_ranges,
+  (ProtobufCMessageInit) drpc__request__init,
   NULL,NULL,NULL    /* reserved[123] */
 };
 static const ProtobufCFieldDescriptor drpc__response__field_descriptors[3] =
@@ -278,3 +278,36 @@ const ProtobufCEnumDescriptor drpc__status__descriptor =
   drpc__status__value_ranges,
   NULL,NULL,NULL,NULL   /* reserved[1234] */
 };
+static const ProtobufCMethodDescriptor drpc__drpc_service__method_descriptors[1] =
+{
+  { "DrpcFunc", &drpc__request__descriptor, &drpc__response__descriptor },
+};
+const unsigned drpc__drpc_service__method_indices_by_name[] = {
+  0         /* DrpcFunc */
+};
+const ProtobufCServiceDescriptor drpc__drpc_service__descriptor =
+{
+  PROTOBUF_C__SERVICE_DESCRIPTOR_MAGIC,
+  "drpc.DrpcService",
+  "DrpcService",
+  "Drpc__DrpcService",
+  "drpc",
+  1,
+  drpc__drpc_service__method_descriptors,
+  drpc__drpc_service__method_indices_by_name
+};
+void drpc__drpc_service__drpc_func(ProtobufCService *service,
+                                   const Drpc__Request *input,
+                                   Drpc__Response_Closure closure,
+                                   void *closure_data)
+{
+  assert(service->descriptor == &drpc__drpc_service__descriptor);
+  service->invoke(service, 0, (const ProtobufCMessage *) input, (ProtobufCClosure) closure, closure_data);
+}
+void drpc__drpc_service__init (Drpc__DrpcService_Service *service,
+                               Drpc__DrpcService_ServiceDestroy destroy)
+{
+  protobuf_c_service_generated_init (&service->base,
+                                     &drpc__drpc_service__descriptor,
+                                     (ProtobufCServiceDestroy) destroy);
+}

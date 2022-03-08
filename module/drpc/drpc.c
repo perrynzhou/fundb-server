@@ -41,14 +41,14 @@ void daos_drpc_free(void *allocater_data, void *pointer)
  * \param	ctx	Active dRPC context
  * \param	module	Module ID for the new call
  * \param	method	Method ID for the new call
- * \param	callp	Newly allocated Drpc__Call
+ * \param	callp	Newly allocated Drpc__Request
  *
  * \returns	On success returns 0 otherwise returns negative error condition.
  */
 int drpc_call_create(struct drpc *ctx, int32_t module, int32_t method,
-					 Drpc__Call **callp)
+					 Drpc__Request **callp)
 {
-	Drpc__Call *call;
+	Drpc__Request *call;
 
 	if (callp)
 		*callp = NULL;
@@ -62,7 +62,7 @@ int drpc_call_create(struct drpc *ctx, int32_t module, int32_t method,
 	if (call == NULL)
 		return -1;
 
-	drpc__call__init(call);
+	Drpc__Request__init(call);
 	call->module = module;
 	call->method = method;
 
@@ -76,11 +76,11 @@ int drpc_call_create(struct drpc *ctx, int32_t module, int32_t method,
  *
  * \param	call	dRPC call to be freed
  */
-void drpc_call_free(Drpc__Call *call)
+void drpc_call_free(Drpc__Request *call)
 {
 	struct drpc_alloc alloc = PROTO_ALLOCATOR_INIT(alloc);
 
-	drpc__call__free_unpacked(call, &alloc.alloc);
+	Drpc__Request__free_unpacked(call, &alloc.alloc);
 }
 
 /**
@@ -92,7 +92,7 @@ void drpc_call_free(Drpc__Call *call)
  *			allocated.
  */
 Drpc__Response *
-drpc_response_create(Drpc__Call *call)
+drpc_response_create(Drpc__Request *call)
 {
 	Drpc__Response *resp;
 
@@ -276,7 +276,7 @@ unixcomm_recv(int fd, uint8_t *buffer, size_t buflen,
 }
 
 static int
-drpc_marshal_call(Drpc__Call *msg, uint8_t **bytes)
+drpc_marshal_call(Drpc__Request *msg, uint8_t **bytes)
 {
 	int buf_len;
 	uint8_t *buf;
@@ -286,13 +286,13 @@ drpc_marshal_call(Drpc__Call *msg, uint8_t **bytes)
 		return -1;
 	}
 
-	buf_len = drpc__call__get_packed_size(msg);
+	buf_len = Drpc__Request__get_packed_size(msg);
 
 	D_ALLOC(buf, buf_len);
 	if (!buf)
 		return -1;
 
-	drpc__call__pack(msg, buf);
+	Drpc__Request__pack(msg, buf);
 
 	*bytes = buf;
 	return buf_len;
@@ -308,7 +308,7 @@ drpc_marshal_call(Drpc__Call *msg, uint8_t **bytes)
  *
  * \returns	On success returns 0 otherwise returns negative error condition.
  */
-int drpc_call(struct drpc *ctx, int flags, Drpc__Call *msg,
+int drpc_call(struct drpc *ctx, int flags, Drpc__Request *msg,
 			  Drpc__Response **resp)
 {
 	struct drpc_alloc alloc = PROTO_ALLOCATOR_INIT(alloc);
@@ -508,7 +508,7 @@ send_response(struct drpc *ctx, Drpc__Response *response)
 }
 
 static int
-get_incoming_call(struct drpc *ctx, Drpc__Call **call)
+get_incoming_call(struct drpc *ctx, Drpc__Request **call)
 {
 	struct drpc_alloc alloc = PROTO_ALLOCATOR_INIT(alloc);
 	int rc;
@@ -528,7 +528,7 @@ get_incoming_call(struct drpc *ctx, Drpc__Call **call)
 		return rc;
 	}
 
-	*call = drpc__call__unpack(&alloc.alloc, message_len, buffer);
+	*call = Drpc__Request__unpack(&alloc.alloc, message_len, buffer);
 	D_FREE(buffer);
 	if (alloc.oom)
 		return -1;
@@ -541,11 +541,11 @@ get_incoming_call(struct drpc *ctx, Drpc__Call **call)
 }
 
 /**
- * Listen for a client message on a dRPC session and return the Drpc__Call
+ * Listen for a client message on a dRPC session and return the Drpc__Request
  * received.
  *
  * \param[in]	session_ctx	Valid dRPC session context
- * \param[out]	call		Newly allocated Drpc__Call
+ * \param[out]	call		Newly allocated Drpc__Request
  *
  * \return	0		Successfully got a message
  *		-DER_INVAL	Invalid input
@@ -554,7 +554,7 @@ get_incoming_call(struct drpc *ctx, Drpc__Call **call)
  *				pending message on the pipe
  *		-DER_PROTO	Badly-formed incoming message
  */
-int drpc_recv_call(struct drpc *session_ctx, Drpc__Call **call)
+int drpc_recv_call(struct drpc *session_ctx, Drpc__Request **call)
 {
 	if (call == NULL)
 	{

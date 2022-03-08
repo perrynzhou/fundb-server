@@ -15,7 +15,7 @@ PROTOBUF_C__BEGIN_DECLS
 #endif
 
 
-typedef struct Drpc__Call Drpc__Call;
+typedef struct Drpc__Request Drpc__Request;
 typedef struct Drpc__Response Drpc__Response;
 
 
@@ -67,7 +67,7 @@ typedef enum _Drpc__Status {
  **
  * Call describes a function call to be executed over the dRPC channel.
  */
-struct  Drpc__Call
+struct  Drpc__Request
 {
   ProtobufCMessage base;
   /*
@@ -87,8 +87,8 @@ struct  Drpc__Call
    */
   ProtobufCBinaryData body;
 };
-#define DRPC__CALL__INIT \
- { PROTOBUF_C_MESSAGE_INIT (&drpc__call__descriptor) \
+#define DRPC__REQUEST__INIT \
+ { PROTOBUF_C_MESSAGE_INIT (&drpc__request__descriptor) \
     , 0, 0, 0, {0,NULL} }
 
 
@@ -117,24 +117,24 @@ struct  Drpc__Response
     , 0, DRPC__STATUS__SUCCESS, {0,NULL} }
 
 
-/* Drpc__Call methods */
-void   drpc__call__init
-                     (Drpc__Call         *message);
-size_t drpc__call__get_packed_size
-                     (const Drpc__Call   *message);
-size_t drpc__call__pack
-                     (const Drpc__Call   *message,
+/* Drpc__Request methods */
+void   drpc__request__init
+                     (Drpc__Request         *message);
+size_t drpc__request__get_packed_size
+                     (const Drpc__Request   *message);
+size_t drpc__request__pack
+                     (const Drpc__Request   *message,
                       uint8_t             *out);
-size_t drpc__call__pack_to_buffer
-                     (const Drpc__Call   *message,
+size_t drpc__request__pack_to_buffer
+                     (const Drpc__Request   *message,
                       ProtobufCBuffer     *buffer);
-Drpc__Call *
-       drpc__call__unpack
+Drpc__Request *
+       drpc__request__unpack
                      (ProtobufCAllocator  *allocator,
                       size_t               len,
                       const uint8_t       *data);
-void   drpc__call__free_unpacked
-                     (Drpc__Call *message,
+void   drpc__request__free_unpacked
+                     (Drpc__Request *message,
                       ProtobufCAllocator *allocator);
 /* Drpc__Response methods */
 void   drpc__response__init
@@ -157,8 +157,8 @@ void   drpc__response__free_unpacked
                       ProtobufCAllocator *allocator);
 /* --- per-message closures --- */
 
-typedef void (*Drpc__Call_Closure)
-                 (const Drpc__Call *message,
+typedef void (*Drpc__Request_Closure)
+                 (const Drpc__Request *message,
                   void *closure_data);
 typedef void (*Drpc__Response_Closure)
                  (const Drpc__Response *message,
@@ -166,12 +166,34 @@ typedef void (*Drpc__Response_Closure)
 
 /* --- services --- */
 
+typedef struct Drpc__DrpcService_Service Drpc__DrpcService_Service;
+struct Drpc__DrpcService_Service
+{
+  ProtobufCService base;
+  void (*drpc_func)(Drpc__DrpcService_Service *service,
+                    const Drpc__Request *input,
+                    Drpc__Response_Closure closure,
+                    void *closure_data);
+};
+typedef void (*Drpc__DrpcService_ServiceDestroy)(Drpc__DrpcService_Service *);
+void drpc__drpc_service__init (Drpc__DrpcService_Service *service,
+                               Drpc__DrpcService_ServiceDestroy destroy);
+#define DRPC__DRPC_SERVICE__BASE_INIT \
+    { &drpc__drpc_service__descriptor, protobuf_c_service_invoke_internal, NULL }
+#define DRPC__DRPC_SERVICE__INIT(function_prefix__) \
+    { DRPC__DRPC_SERVICE__BASE_INIT,\
+      function_prefix__ ## drpc_func  }
+void drpc__drpc_service__drpc_func(ProtobufCService *service,
+                                   const Drpc__Request *input,
+                                   Drpc__Response_Closure closure,
+                                   void *closure_data);
 
 /* --- descriptors --- */
 
 extern const ProtobufCEnumDescriptor    drpc__status__descriptor;
-extern const ProtobufCMessageDescriptor drpc__call__descriptor;
+extern const ProtobufCMessageDescriptor drpc__request__descriptor;
 extern const ProtobufCMessageDescriptor drpc__response__descriptor;
+extern const ProtobufCServiceDescriptor drpc__drpc_service__descriptor;
 
 PROTOBUF_C__END_DECLS
 

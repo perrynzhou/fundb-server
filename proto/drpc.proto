@@ -11,7 +11,7 @@ option go_package = "../pb";
 /**
  * Call describes a function call to be executed over the dRPC channel.
  */
-message Call {
+message Request {
 	int32 module = 1; // ID of the module to process the call.
 	int32 method = 2; // ID of the method to be executed.
 	int64 sequence = 3; // Sequence number for matching a response to this call.
@@ -39,4 +39,8 @@ message Response {
 	int64 sequence = 1; // Sequence number of the Call that triggered this response.
 	Status status = 2; // High-level status of the RPC. If SUCCESS, method-specific status may be included in the body.
 	bytes body = 3; // Output payload produced by the method.
+}
+
+service DrpcService {
+	rpc DrpcFunc(Request) returns(Response) {}
 }
