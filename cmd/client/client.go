@@ -3,7 +3,6 @@ package main
 import (
 	"conf-server/drpc/pb"
 	"context"
-	"encoding/json"
 	"flag"
 	"fmt"
 	"math/rand"
@@ -20,7 +19,7 @@ const (
 )
 
 var (
-	addr = flag.String("s", "127.0.0.1:8181", "defaule address")
+	addr = flag.String("s", "127.0.0.1:50051", "defaule address")
 	op   = flag.String("t", "create_schema", "default api request")
 )
 
@@ -55,7 +54,7 @@ func main() {
 			log.Fatalf("could call DrpcFunc: %v", err)
 		}
 		createResp := &pb.CreateSchemaReq{}
-		json.Unmarshal(response.Body, createResp)
+		proto.Unmarshal(response.Body, createResp)
 		log.Info("createResponse=", createResp)
 		break
 	default:
