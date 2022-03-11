@@ -1,7 +1,7 @@
 package main
 
 import (
-	"conf-server/drpc/conf"
+	"conf-server/drpc/conf_service"
 	"conf-server/drpc/pb"
 	"conf-server/util"
 	"flag"
@@ -42,7 +42,7 @@ func main() {
 	}
 	s := grpc.NewServer()
 
-	confService := conf.NewConfService(*sockFile)
+	confService := conf_service.NewConfService(*sockFile)
 	pb.RegisterDrpcServiceServer(s,confService)
 	log.Printf("server listening at %v", lis.Addr())
 	go func() {

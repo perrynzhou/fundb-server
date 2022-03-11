@@ -8,7 +8,7 @@
 // versions:
 // 	protoc-gen-go v1.27.1
 // 	protoc        v3.17.3
-// source: conf.proto
+// source: conf_service.proto
 
 package pb
 
@@ -768,18 +768,18 @@ func file_conf_proto_rawDescGZIP() []byte {
 
 var file_conf_proto_msgTypes = make([]protoimpl.MessageInfo, 12)
 var file_conf_proto_goTypes = []interface{}{
-	(*CreateSchemaReq)(nil),  // 0: conf.CreateSchemaReq
-	(*CreateSchemaResp)(nil), // 1: conf.CreateSchemaResp
-	(*QuerySchemaReq)(nil),   // 2: conf.QuerySchemaReq
-	(*QuerySchemaResp)(nil),  // 3: conf.QuerySchemaResp
-	(*DeleteSchemaReq)(nil),  // 4: conf.DeleteSchemaReq
-	(*DeleteSchemaResp)(nil), // 5: conf.DeleteSchemaResp
-	(*PutConfReq)(nil),       // 6: conf.PutConfReq
-	(*PutConfResp)(nil),      // 7: conf.PutConfResp
-	(*GetConfReq)(nil),       // 8: conf.GetConfReq
-	(*GetConfResp)(nil),      // 9: conf.GetConfResp
-	(*DeleteConfReq)(nil),    // 10: conf.DeleteConfReq
-	(*DeleteConfResp)(nil),   // 11: conf.DeleteConfResp
+	(*CreateSchemaReq)(nil),  // 0: conf_service.CreateSchemaReq
+	(*CreateSchemaResp)(nil), // 1: conf_service.CreateSchemaResp
+	(*QuerySchemaReq)(nil),   // 2: conf_service.QuerySchemaReq
+	(*QuerySchemaResp)(nil),  // 3: conf_service.QuerySchemaResp
+	(*DeleteSchemaReq)(nil),  // 4: conf_service.DeleteSchemaReq
+	(*DeleteSchemaResp)(nil), // 5: conf_service.DeleteSchemaResp
+	(*PutConfReq)(nil),       // 6: conf_service.PutConfReq
+	(*PutConfResp)(nil),      // 7: conf_service.PutConfResp
+	(*GetConfReq)(nil),       // 8: conf_service.GetConfReq
+	(*GetConfResp)(nil),      // 9: conf_service.GetConfResp
+	(*DeleteConfReq)(nil),    // 10: conf_service.DeleteConfReq
+	(*DeleteConfResp)(nil),   // 11: conf_service.DeleteConfResp
 }
 var file_conf_proto_depIdxs = []int32{
 	0, // [0:0] is the sub-list for method output_type
