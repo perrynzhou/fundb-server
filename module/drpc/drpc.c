@@ -62,7 +62,7 @@ int drpc_call_create(struct drpc *ctx, int32_t module, int32_t method,
 	if (call == NULL)
 		return -1;
 
-	Drpc__Request__init(call);
+	drpc__request__init(call);
 	call->module = module;
 	call->method = method;
 
@@ -80,7 +80,7 @@ void drpc_call_free(Drpc__Request *call)
 {
 	struct drpc_alloc alloc = PROTO_ALLOCATOR_INIT(alloc);
 
-	Drpc__Request__free_unpacked(call, &alloc.alloc);
+	drpc__request__free_unpacked(call, &alloc.alloc);
 }
 
 /**
@@ -286,13 +286,13 @@ drpc_marshal_call(Drpc__Request *msg, uint8_t **bytes)
 		return -1;
 	}
 
-	buf_len = Drpc__Request__get_packed_size(msg);
+	buf_len =drpc__request__get_packed_size(msg);
 
 	D_ALLOC(buf, buf_len);
 	if (!buf)
 		return -1;
 
-	Drpc__Request__pack(msg, buf);
+	drpc__request__pack(msg, buf);
 
 	*bytes = buf;
 	return buf_len;
@@ -528,7 +528,7 @@ get_incoming_call(struct drpc *ctx, Drpc__Request **call)
 		return rc;
 	}
 
-	*call = Drpc__Request__unpack(&alloc.alloc, message_len, buffer);
+	*call = drpc__request__unpack(&alloc.alloc, message_len, buffer);
 	D_FREE(buffer);
 	if (alloc.oom)
 		return -1;
