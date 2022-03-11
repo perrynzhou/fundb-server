@@ -1,6 +1,7 @@
 package main
 
 import (
+	"conf-server/drpc/pb"
 	"context"
 	"encoding/json"
 	"flag"
@@ -8,11 +9,10 @@ import (
 	"math/rand"
 	"time"
 
-	"conf-server/drpc/pb"
-
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
+	"google.golang.org/protobuf/proto"
 )
 
 const (
@@ -20,7 +20,7 @@ const (
 )
 
 var (
-	addr = flag.String("s", "127.0.0.1:50051", "defaule address")
+	addr = flag.String("s", "127.0.0.1:8181", "defaule address")
 	op   = flag.String("t", "create_schema", "default api request")
 )
 
@@ -35,7 +35,7 @@ func main() {
 	c := pb.NewDrpcServiceClient(conn)
 
 	// Contact the server and print out its response.
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10000)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*1000)
 	defer cancel()
 	var request *pb.Request
 	var response *pb.Response
@@ -44,7 +44,8 @@ func main() {
 		createRequest := &pb.CreateSchemaReq{
 			Name: fmt.Sprintf("schema-%d", rand.Int31()),
 		}
-		body, _ := json.Marshal(createRequest)
+		// createRequest
+		body, _ := proto.Marshal(createRequest)
 		request = &pb.Request{
 			Method: DRPC_METHOD_CREATE_SCHEMA,
 			Body:   body,
@@ -56,6 +57,8 @@ func main() {
 		createResp := &pb.CreateSchemaReq{}
 		json.Unmarshal(response.Body, createResp)
 		log.Info("createResponse=", createResp)
+		break
+	default:
 		break
 	}
 
