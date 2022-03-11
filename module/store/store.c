@@ -8,10 +8,10 @@
 #include <stdio.h>
 #include "../drpc/drpc.pb-c.h"
 #include "../drpc/drpc_util.h"
-#include "../utils/log.h"
-#include "./kv.pb-c.h"
-#include "./kv.h"
-#include "./kv_db.h"
+#include "log.h"
+#include "kv.pb-c.h"
+#include "store.h"
+#include "kv_db.h"
 enum drpc_kv_method
 {
   DRPC_METHOD_CREATE_SCHEMA = 201,
@@ -28,11 +28,11 @@ static void create_schmea(Drpc__Request *drpc_req, Drpc__Response *drpc_resp, vo
   if (buffer != NULL)
   {
     Kv__CreateSchemaReq *req = kv__create_schema_req__unpack(&alloc.alloc, drpc_req->body.len, drpc_req->body.data);
-    kv_schema_t *schmea = kv_db_fetch_schema(db, req->name);
+    kv_schema_t *schema = kv_db_fetch_schema(db, req->name);
     bool done = false;
-    if (NULL == schmea)
+    if (NULL == schema)
     {
-      schmea = kv_schema_alloc(req->name, db, false);
+      schema = kv_schema_alloc(req->name, db, false);
       done = true;
     }
     D_FREE(buffer);
@@ -67,12 +67,12 @@ static void create_schmea(Drpc__Request *drpc_req, Drpc__Response *drpc_resp, vo
     }
   }
 }
-void kv_process_drpc_request(Drpc__Request *drpc_req, Drpc__Response *drpc_resp)
+void process_drpc_request(Drpc__Request *drpc_req, Drpc__Response *drpc_resp,void *ctx)
 {
   switch (drpc_req->method)
   {
   case DRPC_METHOD_CREATE_SCHEMA:
-    create_schmea(drpc_req, drpc_resp);
+    create_schmea(drpc_req, drpc_resp,ctx);
     break;
   default:
     break;

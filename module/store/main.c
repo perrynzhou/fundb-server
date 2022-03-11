@@ -17,10 +17,10 @@
 #include <sys/epoll.h>
 #include <errno.h>
 #include "../drpc/drpc.pb-c.h"
-#include "../kv/kv.pb-c.h"
-#include "../utils/log.h"
-#include "kv.h"
+#include "kv.pb-c.h"
+#include "log.h"
 #include "kv_db.h"
+#include "store.h"
 
 #define MAXEVENTS 64
 #define DEFAULT_LOCAL_SOCKET_FILE "/tmp/drpc_socket.sock"
