@@ -4,7 +4,7 @@
 // SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 
-package conf
+package conf_service
 
 import (
 	"conf-server/drpc/pb"

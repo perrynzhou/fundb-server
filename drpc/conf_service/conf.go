@@ -1,8 +1,9 @@
-package conf
+package conf_service
 
 import (
 	"conf-server/drpc/pb"
 	"context"
+	log "github.com/sirupsen/logrus"
 )
 
 
@@ -18,6 +19,8 @@ func NewConfService(sockFile string) *ConfService {
 }
 
 func (cs *ConfService)DrpcFunc(ctx context.Context,Req *pb.Request)  (*pb.Response,error) {
+	log.Info("********recv request*******")
+	log.Info("request method=",Req.Method)
 	c := NewClientConnection(cs.localSockFile)
 	c.Connect()
 	response,err :=c.IssueCall(Req)
