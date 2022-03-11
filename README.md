@@ -29,3 +29,5 @@ $ cd conf-server && ./test_server
 // 请求创建test_server
 $ cd conf-server && ./test_server
 ```
+## conf-server项目进度
+![](./doc/conf-server.png)
