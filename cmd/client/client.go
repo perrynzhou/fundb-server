@@ -55,7 +55,7 @@ func main() {
 		}
 		createResp := &pb.CreateSchemaReq{}
 		proto.Unmarshal(response.Body, createResp)
-		log.Info("createResponse=", createResp)
+		log.Info("createResponse:", createResp)
 		break
 	default:
 		break
