@@ -17,7 +17,7 @@ enum drpc_kv_method
   DRPC_METHOD_CREATE_SCHEMA = 201,
 };
 
-static void create_schmea(Drpc__Call *drpc_req, Drpc__Response *drpc_resp, void *ctx)
+static void create_schmea(Drpc__Request *drpc_req, Drpc__Response *drpc_resp, void *ctx)
 {
   kv_db_t *db = (kv_db_t *)ctx;
   struct drpc_alloc alloc = PROTO_ALLOCATOR_INIT(alloc);
@@ -67,7 +67,7 @@ static void create_schmea(Drpc__Call *drpc_req, Drpc__Response *drpc_resp, void 
     }
   }
 }
-void kv_process_drpc_request(Drpc__Call *drpc_req, Drpc__Response *drpc_resp)
+void kv_process_drpc_request(Drpc__Request *drpc_req, Drpc__Response *drpc_resp)
 {
   switch (drpc_req->method)
   {

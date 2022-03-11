@@ -5,7 +5,7 @@
 //
 
 syntax = "proto3";
-package conf_service;
+package conf;
 option go_package = "../pb";
 
 message CreateSchemaReq {

@@ -1,7 +1,7 @@
 package main
 
 import (
-	"conf-server/drpc/conf-service"
+	"conf-server/drpc/conf"
 	"conf-server/drpc/pb"
 	"conf-server/util"
 	"flag"
@@ -20,6 +20,10 @@ var (
 	port     = flag.Int("p", 50051, "The server port")
 )
 
+const (
+	DRPC_METHOD_CREATE_SCHEMA = 201
+
+)
 func init() {
 	logHook := util.NewHook()
 	logHook.Field = "line"
@@ -38,8 +42,8 @@ func main() {
 	}
 	s := grpc.NewServer()
 
-	confService := conf_service.NewConfService(*sockFile)
-	pb.RegisterDrpcServiceServer(s, confService)
+	confService := conf.NewConfService(*sockFile)
+	pb.RegisterDrpcServiceServer(s,confService)
 	log.Printf("server listening at %v", lis.Addr())
 	go func() {
 		if err := s.Serve(lis); err != nil {

@@ -2,23 +2,25 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"flag"
-	"log"
+	"fmt"
+	"math/rand"
 	"time"
 
 	"conf-server/drpc/pb"
-
+	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
-
 const (
-	defaultName = "world"
+	DRPC_METHOD_CREATE_SCHEMA = 201
+
 )
 
 var (
 	addr = flag.String("s", "127.0.0.1:8181", "defaule address")
-	name = flag.String("t", "query_schmea", "default api request")
+	op = flag.String("t", "query_schmea", "default api request")
 )
 
 func main() {
@@ -34,9 +36,27 @@ func main() {
 	// Contact the server and print out its response.
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
-	r, err := c.DrpcFunc(ctx, &pb.Request{})
-	if err != nil {
-		log.Fatalf("could not greet: %v", err)
+	var request *pb.Request
+	var response *pb.Response
+	switch(*op) {
+	case "create_schema":
+		createRequest := &pb.CreateSchemaReq{
+			Name: fmt.Sprintf("schema-%d",rand.Int31()),
+		}
+		body,_:= json.Marshal(createRequest)
+		request = &pb.Request{
+		   Method: DRPC_METHOD_CREATE_SCHEMA,
+		   Body:body,
+		}
+		response, err = c.DrpcFunc(ctx, request)
+		if err != nil {
+			log.Fatalf("could call DrpcFunc: %v", err)
+		}
+		createResp := &pb.CreateSchemaReq{}
+		json.Unmarshal(response.Body,createResp)
+		log.Info("createResponse=",createResp)
+		break
 	}
-	log.Printf("Greeting: %s", r.GetBody())
+
+
 }

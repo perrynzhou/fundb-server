@@ -13,7 +13,7 @@
 #include "../drpc/drpc_util.h"
 #include "../utils/log.h"
 #include "./kv.pb-c.h"
-void kv_process_drpc_request(Drpc__Call *drpc_req, Drpc__Response *drpc_resp,void *ctx);
+void kv_process_drpc_request(Drpc__Request *drpc_req, Drpc__Response *drpc_resp,void *ctx);
 
  static struct drpc_handler kv_drpc_handlers[] = {
     {.module_id = 0,
