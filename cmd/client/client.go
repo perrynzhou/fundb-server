@@ -9,18 +9,19 @@ import (
 	"time"
 
 	"conf-server/drpc/pb"
+
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
+
 const (
 	DRPC_METHOD_CREATE_SCHEMA = 201
-
 )
 
 var (
-	addr = flag.String("s", "127.0.0.1:8181", "defaule address")
-	op = flag.String("t", "create_schema", "default api request")
+	addr = flag.String("s", "127.0.0.1:50051", "defaule address")
+	op   = flag.String("t", "create_schema", "default api request")
 )
 
 func main() {
@@ -34,29 +35,28 @@ func main() {
 	c := pb.NewDrpcServiceClient(conn)
 
 	// Contact the server and print out its response.
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10000)
 	defer cancel()
 	var request *pb.Request
 	var response *pb.Response
-	switch(*op) {
+	switch *op {
 	case "create_schema":
 		createRequest := &pb.CreateSchemaReq{
-			Name: fmt.Sprintf("schema-%d",rand.Int31()),
+			Name: fmt.Sprintf("schema-%d", rand.Int31()),
 		}
-		body,_:= json.Marshal(createRequest)
+		body, _ := json.Marshal(createRequest)
 		request = &pb.Request{
-		   Method: DRPC_METHOD_CREATE_SCHEMA,
-		   Body:body,
+			Method: DRPC_METHOD_CREATE_SCHEMA,
+			Body:   body,
 		}
 		response, err = c.DrpcFunc(ctx, request)
 		if err != nil {
 			log.Fatalf("could call DrpcFunc: %v", err)
 		}
 		createResp := &pb.CreateSchemaReq{}
-		json.Unmarshal(response.Body,createResp)
-		log.Info("createResponse=",createResp)
+		json.Unmarshal(response.Body, createResp)
+		log.Info("createResponse=", createResp)
 		break
 	}
-
 
 }
