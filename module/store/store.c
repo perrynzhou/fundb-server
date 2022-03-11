@@ -21,7 +21,7 @@ static void create_schema(Drpc__Request *drpc_req, Drpc__Response *drpc_resp, vo
 {
   kv_db_t *db = (kv_db_t *)ctx;
   struct drpc_alloc alloc = PROTO_ALLOCATOR_INIT(alloc);
-  void *ptr = kv__create_schema_req__unpack(&alloc.alloc, drpc_req->body.len, drpc_req->body.data);
+  void *ptr = kv__create_schema_req__unpack(NULL, drpc_req->body.len, drpc_req->body.data);
   Kv__CreateSchemaReq *req = kv__create_schema_req__unpack(&alloc.alloc, drpc_req->body.len, drpc_req->body.data);
   kv_schema_t *schema = kv_db_fetch_schema(db, req->name);
   bool done = false;
