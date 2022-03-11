@@ -20,7 +20,7 @@ const (
 
 var (
 	addr = flag.String("s", "127.0.0.1:8181", "defaule address")
-	op = flag.String("t", "query_schmea", "default api request")
+	op = flag.String("t", "create_schema", "default api request")
 )
 
 func main() {
