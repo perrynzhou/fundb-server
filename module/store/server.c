@@ -27,20 +27,17 @@ static void server_cb(EV_P_ ev_io *w, int revents)
 {
 
     server_t *srv = (server_t *)w;
-    while (1)
+    struct drpc *session_ctx = NULL;
+    while ((session_ctx = drpc_accept(srv->listener))!=NULL)
     {
-        struct drpc *session_ctx = drpc_accept(srv->listener);
-        if (session_ctx != NULL && session_ctx->fd !=-1)
+        if (session_ctx->fd !=-1)
         {
             log_info("server sfd=%d,accepted a client=%d",srv->listener->fd,session_ctx->fd);
             client_t *c = client_alloc(session_ctx->fd);
             c->session_ctx = session_ctx;
             c->db_ctx = srv->db_ctx;
             ev_io_start(EV_A_ & c->io);
-        }else {
-            break;
         }
-     
     }
 }
 
