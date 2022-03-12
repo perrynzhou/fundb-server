@@ -6,6 +6,7 @@
  ************************************************************************/
 
 #include "server.h"
+#include "client.h"
 #include "../drpc/drpc_util.h"
 #include <stdlib.h>
 #include <string.h>
@@ -49,20 +50,31 @@ static void server_cb(EV_P_ ev_io *w, int revents)
         printf("accepted a client\n");
         client_t *c = client_alloc(client_fd);
         struct drpc *session_ctx = drpc_accept(srv->listener);
-        c->ctx = session_ctx;
+        c->session_ctx = session_ctx;
+        c->db_ctx = srv->db_ctx;
         ev_io_start(EV_A_ & client->io);
     }
 }
 
-server_t *server_alloc(int server_type, const char *socket_name, drpc_handler_func handler, void *ctx)
+inline static void remove_socket(const char *name)
+{
+    if (access(name, F_OK) == 0)
+    {
+        remove(name);
+    }
+}
+server_t *server_alloc(int server_type, int id, drpc_handler_func handler, void *ctx)
 {
     server_t *srv = calloc(1, sizeof(server_t));
     assert(srv != NULL);
+    char buffer[256] = {'\0'};
+    snprintf(&buffer, 256, "/tmp/%s_%d_%d.sock", server_types[server_type], getpid(), id);
+    src->socket = strdup(&buffer);
+    remove_socket(src->socket);
     struct drpc *listener = drpc_listen(socket_name, handler);
     srv->server_type = server_type;
     srv->listener = listener;
-    srv->ctx = ctx;
-    src->socket = strdup(socket_name);
+    srv->db_ctx = (kv_db_t *)ctx;
     return srv;
 }
 

@@ -10,19 +10,20 @@
 static void client_cb(EV_P_ ev_io *w, int revents)
 {
     client_t *c = (struct client_t *)w;
-    struct drpc *session_ctx = (struct drpc *)client->ctx;
+    struct drpc *session_ctx = (struct drpc *)client->session_ctx;
     Drpc__Request *incoming;
     int result = drpc_recv_call(session_ctx, &incoming);
     if (result != -1)
     {
+        kv_db_t *db_ctx = c->db_ctx;
         Drpc__Response *resp = drpc_response_create(incoming);
         log_info("enter handler=%p", session_ctx->handler);
-        session_ctx->handler(incoming, resp, db);
+        session_ctx->handler(incoming, resp, db_ctx);
         drpc_send_response(session_ctx, resp);
         drpc_response_free(resp);
         return;
     }
-    ev_io_stop(EV_A_ &c->io);
+    ev_io_stop(EV_A_ & c->io);
     close(c->fd);
     client_free(c);
 }

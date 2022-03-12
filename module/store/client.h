@@ -12,8 +12,9 @@ struct
 {
     ev_io io;
     int fd;
-    server_t *server;
-    void *ctx;
+    kv_db_t *db_ctx;
+    struct drpc *session_ctx;
+
 } client_t;
 
 // client impl

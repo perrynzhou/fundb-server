@@ -16,153 +16,36 @@
 #include <fcntl.h>
 #include <sys/epoll.h>
 #include <errno.h>
-#include "../drpc/drpc.pb-c.h"
-#include "kv.pb-c.h"
+#include <pthread.h>
 #include "log.h"
 #include "kv_db.h"
 #include "store.h"
-
+#include "server.h"
 #define MAXEVENTS 64
-#define DEFAULT_LOCAL_SOCKET_FILE "/tmp/drpc_socket.sock"
-inline static void remove_drpc_socket_file(const char *name)
-{
-  if (access(name, F_OK) == 0)
-  {
-    remove(name);
-  }
+
+
+void *thread_cb(void *ctx) {
+   server_t *srv = (server_t *)ctx;
+   server_start(srv);
+   return NULL;
 }
-static int
-make_socket_non_blocking(int sfd)
-{
-  int flags, s;
-
-  flags = fcntl(sfd, F_GETFL, 0);
-  if (flags == -1)
-  {
-    perror("fcntl");
-    return -1;
-  }
-
-  flags |= O_NONBLOCK;
-  s = fcntl(sfd, F_SETFL, flags);
-  if (s == -1)
-  {
-    perror("fcntl");
-    return -1;
-  }
-
-  return 0;
-}
-
 int main(int argc, char *argv[])
 {
  
+  int n=1;
+  kv_db_t *db = kv_db_alloc(argv[1],argv[2]);
+  pthread_t *threads = calloc(n,sizeof(pthread_t));
+  assert(servers !=NULL);
+  assert(threads !=NULL);
   log_init(NULL);
-  int sfd, s;
-  int efd;
-  struct epoll_event event;
-  struct epoll_event *events;
-
-  efd = epoll_create1(0);
-  if (efd == -1)
-  {
-    perror("epoll_create");
-    abort();
-  }
-
-  remove_drpc_socket_file(DEFAULT_LOCAL_SOCKET_FILE);
   kv_db_t *db = kv_db_alloc(argv[1],argv[2]);
   assert(db !=NULL);
-  struct drpc *listener_ctx = drpc_listen(DEFAULT_LOCAL_SOCKET_FILE, kv_drpc_handlers[0].handler);
-  sfd = listener_ctx->fd;
-  event.data.fd = listener_ctx->fd;
-  event.events = EPOLLIN | EPOLLET;
-  s = epoll_ctl(efd, EPOLL_CTL_ADD, sfd, &event);
-  if (s == -1)
-  {
-    perror("epoll_ctl");
-    abort();
+  server_t *drpc_server = server_alloc(DRPC_SERVER_TYPE,1,kv_drpc_handlers[0].handler,db);
+  pthread_create(&threads[0],NULL,&thread_cb,drpc_server);
+  for(int i=0;i<n;i++) {
+    pthread_join(threads[i],NULL);
   }
-
-  /* Buffer where events are returned */
-  events = calloc(MAXEVENTS, sizeof event);
- 
-  /* The event loop */
-  while (1)
-  {
-    int n, i;
-
-    n = epoll_wait(efd, events, MAXEVENTS, -1);
-    for (i = 0; i < n; i++)
-    {
-      if ((events[i].events & EPOLLERR) ||
-          (events[i].events & EPOLLHUP) ||
-          (!(events[i].events & EPOLLIN)))
-      {
-        close(events[i].data.fd);
-        log_info("fd=%d closed", events[i].data.fd);
-        continue;
-      }
-
-      else if (sfd == events[i].data.fd)
-      {
-        struct sockaddr in_addr;
-        char hbuf[NI_MAXHOST], sbuf[NI_MAXSERV];
-        socklen_t in_len = sizeof in_addr;
-        struct drpc *session_ctx = drpc_accept(listener_ctx);
-        if (session_ctx == NULL)
-        {
-          log_info("session_ctx=%p is nil", session_ctx);
-          break;
-        }
-        int infd = session_ctx->fd;
-        if (infd == -1)
-        {
-          if ((errno == EAGAIN) ||
-              (errno == EWOULDBLOCK))
-          {
-            break;
-          }
-        }
-
-        s = getnameinfo(&in_addr, in_len,
-                        hbuf, sizeof hbuf,
-                        sbuf, sizeof sbuf,
-                        NI_NUMERICHOST | NI_NUMERICSERV);
-        if (s == 0)
-        {
-          log_info("Accepted connection on descriptor %d (host=%s, port=%s)", infd, hbuf, sbuf);
-        }
-
-        event.data.fd = infd;
-        event.data.ptr = session_ctx;
-        event.events = EPOLLIN | EPOLLET;
-        s = epoll_ctl(efd, EPOLL_CTL_ADD, infd, &event);
-        if (s == -1)
-        {
-          epoll_ctl(efd, EPOLL_CTL_DEL, infd, NULL);
-          log_info("fd=%d closed", infd);
-        }
-
-        continue;
-      }
-      else
-      {
-        struct drpc *session_ctx = events[i].data.ptr;
-        Drpc__Request *incoming;
-        int result = drpc_recv_call(session_ctx, &incoming);
-        Drpc__Response *resp = drpc_response_create(incoming);
-        log_info("enter handler=%p", session_ctx->handler);
-        session_ctx->handler(incoming, resp,db);
-        drpc_send_response(session_ctx, resp);
-        drpc_response_free(resp);
-      }
-    }
-  }
-
-  free(events);
-
-  close(sfd);
-
+  free(threads !=NULL);
+  server_free(drpc_server);
   return EXIT_SUCCESS;
 }
