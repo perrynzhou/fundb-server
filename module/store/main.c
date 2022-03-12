@@ -35,7 +35,6 @@ int main(int argc, char *argv[])
   int n=1;
   kv_db_t *db = kv_db_alloc(argv[1],argv[2]);
   pthread_t *threads = calloc(n,sizeof(pthread_t));
-  assert(servers !=NULL);
   assert(threads !=NULL);
   log_init(NULL);
   kv_db_t *db = kv_db_alloc(argv[1],argv[2]);
