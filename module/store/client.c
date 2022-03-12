@@ -6,6 +6,8 @@
  ************************************************************************/
 #include "client.h"
 #include "../drpc/drpc.pb-c.h"
+#include "store.h"
+#include "kv_db.h"
 #include <stdlib.h>
 static void client_cb(EV_P_ ev_io *w, int revents)
 {
@@ -33,7 +35,7 @@ client_t *client_alloc(int fd)
     c->fd = fd;
     // client->server = server;
     setnonblock(c->fd);
-    ev_io_init(&c->io, client_cb, client->fd, EV_READ);
+    ev_io_init(&c->io, client_cb, c->fd, EV_READ);
     return client;
 }
 void client_free(client_t *c)

@@ -7,6 +7,10 @@
 
 #ifndef _CLIENT_H
 #define _CLIENT_H
+#include "../drpc/drpc.pb-c.h"
+#include "store.h"
+#include "kv_db.h"
+#include <stdlib.h>
 #include <ev.h>
 struct
 {
@@ -14,7 +18,6 @@ struct
     int fd;
     kv_db_t *db_ctx;
     struct drpc *session_ctx;
-
 } client_t;
 
 // client impl
