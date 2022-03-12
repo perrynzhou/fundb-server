@@ -17,15 +17,8 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <sys/epoll.h>
+#include <errno.h>
 
-static int setnonblock(int fd)
-{
-    int flags;
-
-    flags = fcntl(fd, F_GETFL);
-    flags |= O_NONBLOCK;
-    return fcntl(fd, F_SETFL, flags);
-}
 static void not_blocked(EV_P_ ev_periodic *w, int revents)
 {
     fprintf(stdout, "i'm not blocked\n");
@@ -33,26 +26,21 @@ static void not_blocked(EV_P_ ev_periodic *w, int revents)
 static void server_cb(EV_P_ ev_io *w, int revents)
 {
 
-    int client_fd;
     server_t *srv = (server_t *)w;
     while (1)
     {
-        client_fd = accept(server->fd, NULL, NULL);
-        if (client_fd == -1)
+        struct drpc *session_ctx = drpc_accept(srv->listener);
+        if (session_ctx != NULL && session_ctx->fd !=-1)
         {
-            if (errno != EAGAIN && errno != EWOULDBLOCK)
-            {
-                printf("accept() failed errno=%i (%s)\n", errno, strerror(errno));
-                exit(EXIT_FAILURE);
-            }
+            log_info("server sfd=%d,accepted a client=%d",srv->listener->fd,session_ctx->fd);
+            client_t *c = client_alloc(session_ctx->fd);
+            c->session_ctx = session_ctx;
+            c->db_ctx = srv->db_ctx;
+            ev_io_start(EV_A_ & c->io);
+        }else {
             break;
         }
-        printf("accepted a client\n");
-        client_t *c = client_alloc(client_fd);
-        struct drpc *session_ctx = drpc_accept(srv->listener);
-        c->session_ctx = session_ctx;
-        c->db_ctx = srv->db_ctx;
-        ev_io_start(EV_A_ & client->io);
+     
     }
 }
 
@@ -63,15 +51,16 @@ inline static void remove_socket(const char *name)
         remove(name);
     }
 }
-server_t *server_alloc(int server_type, int id, drpc_handler_func handler, void *ctx)
+server_t *server_alloc(int server_type, drpc_handler_func handler, void *ctx)
 {
     server_t *srv = calloc(1, sizeof(server_t));
     assert(srv != NULL);
     char buffer[256] = {'\0'};
-    snprintf(&buffer, 256, "/tmp/%s_%d_%d.sock", server_types[server_type], getpid(), id);
-    src->socket = strdup(&buffer);
-    remove_socket(src->socket);
-    struct drpc *listener = drpc_listen(socket_name, handler);
+    snprintf(&buffer, 256, "/tmp/%s.sock", server_type_names[server_type]);
+    srv->socket = strdup(&buffer);
+    remove_socket(srv->socket);
+    struct drpc *listener = drpc_listen(srv->socket, handler);
+    srv->fd = listener->fd;
     srv->server_type = server_type;
     srv->listener = listener;
     srv->db_ctx = (kv_db_t *)ctx;
@@ -87,7 +76,7 @@ void server_start(server_t *srv)
     ev_periodic_start(EV_A_ & every_few_seconds);
 
     ev_io_init(&srv->io, server_cb, srv->fd, EV_READ);
-    ev_io_start(EV_A_ & server.io);
+    ev_io_start(EV_A_ & srv->io);
 
     ev_loop(EV_A_ 0);
 

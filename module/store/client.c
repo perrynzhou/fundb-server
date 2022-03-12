@@ -8,13 +8,16 @@
 #include "../drpc/drpc.pb-c.h"
 #include "store.h"
 #include "kv_db.h"
+#include "util.h"
+#include "log.h"
 #include <stdlib.h>
 static void client_cb(EV_P_ ev_io *w, int revents)
 {
     client_t *c = (struct client_t *)w;
-    struct drpc *session_ctx = (struct drpc *)client->session_ctx;
+    struct drpc *session_ctx = (struct drpc *)c->session_ctx;
     Drpc__Request *incoming;
     int result = drpc_recv_call(session_ctx, &incoming);
+    log_info("client cb result=%d",result);
     if (result != -1)
     {
         kv_db_t *db_ctx = c->db_ctx;
@@ -31,12 +34,12 @@ static void client_cb(EV_P_ ev_io *w, int revents)
 }
 client_t *client_alloc(int fd)
 {
-    client_t *c = realloc(NULL, sizeof(struct client_t));
+    client_t *c = calloc(1, sizeof(client_t));
     c->fd = fd;
     // client->server = server;
     setnonblock(c->fd);
     ev_io_init(&c->io, client_cb, c->fd, EV_READ);
-    return client;
+    return c;
 }
 void client_free(client_t *c)
 {

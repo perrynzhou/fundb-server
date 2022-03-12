@@ -33,13 +33,12 @@ int main(int argc, char *argv[])
 {
  
   int n=1;
-  kv_db_t *db = kv_db_alloc(argv[1],argv[2]);
   pthread_t *threads = calloc(n,sizeof(pthread_t));
   assert(threads !=NULL);
   log_init(NULL);
   kv_db_t *db = kv_db_alloc(argv[1],argv[2]);
   assert(db !=NULL);
-  server_t *drpc_server = server_alloc(DRPC_SERVER_TYPE,1,kv_drpc_handlers[0].handler,db);
+  server_t *drpc_server = server_alloc(DRPC_SERVER_TYPE,kv_drpc_handlers[0].handler,db);
   pthread_create(&threads[0],NULL,&thread_cb,drpc_server);
   for(int i=0;i<n;i++) {
     pthread_join(threads[i],NULL);

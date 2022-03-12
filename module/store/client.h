@@ -12,7 +12,7 @@
 #include "kv_db.h"
 #include <stdlib.h>
 #include <ev.h>
-struct
+typedef struct
 {
     ev_io io;
     int fd;

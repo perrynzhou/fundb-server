@@ -7,7 +7,20 @@
 
 #include "util.h"
 #include <stdio.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netdb.h>
+#include <unistd.h>
+#include <fcntl.h>
 static const char *const hex = "0123456789abcdef";
+int setnonblock(int fd)
+{
+    int flags;
+
+    flags = fcntl(fd, F_GETFL);
+    flags |= O_NONBLOCK;
+    return fcntl(fd, F_SETFL, flags);
+}
 char *safe_utoa(int _base, uint64_t val, char *buf)
 {
   uint32_t base = (uint32_t)_base;
