@@ -1,4 +1,4 @@
-package conf_service
+package service
 
 import (
 	"conf-server/drpc/pb"

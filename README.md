@@ -10,12 +10,16 @@ $ cd conf-server/ && ./build.sh
 
 ```
 
+### 编译libev
+```
+$ cd conf-server/module/libev && ./configure && make && make install
+```
 ### 编译store服务
 
 ```
 $ cd conf-server/module/store && make
-// demo 是配置服务的存储服务，/tmp是数据库存储路径
-$ ./test_server demo /tmp
+// demo 是配置服务的存储服务，/tmp是数据库存储路径,4代表线程数
+$ ./test_server demo /tmp 4
 ```
 
 ### 启动服务
