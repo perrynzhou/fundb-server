@@ -1,8 +1,8 @@
 package main
 
 import (
-	"conf-server/drpc/conf_service"
 	"conf-server/drpc/pb"
+	"conf-server/drpc/service"
 	"conf-server/util"
 	"flag"
 	"fmt"
@@ -16,14 +16,14 @@ import (
 )
 
 var (
-	port     = flag.Int("p", 50051, "The server port")
-	threadNum = flag.Int("n",1,"default thread worker")
+	port      = flag.Int("p", 50051, "The server port")
+	threadNum = flag.Int("n", 1, "default thread worker")
 )
 
 const (
 	DRPC_METHOD_CREATE_SCHEMA = 201
-
 )
+
 func init() {
 	logHook := util.NewHook()
 	logHook.Field = "line"
@@ -42,8 +42,8 @@ func main() {
 	}
 	s := grpc.NewServer()
 
-	confService := conf_service.NewConfService(*threadNum)
-	pb.RegisterDrpcServiceServer(s,confService)
+	confService := service.NewConfService(*threadNum)
+	pb.RegisterDrpcServiceServer(s, confService)
 	log.Printf("server listening at %v", lis.Addr())
 	go func() {
 		if err := s.Serve(lis); err != nil {
