@@ -21,6 +21,7 @@
 #include "kv_db.h"
 #include "store.h"
 #include "server.h"
+#include "conf.h"
 #define MAXEVENTS 64
 
 typedef struct
@@ -59,18 +60,33 @@ void server_thread_free(server_thread_t *srv_thread)
 int main(int argc, char *argv[])
 {
 
-  int n = atoi(argv[3]);
+  char *conf_file = argv[1];
+  if (conf_file == NULL)
+  {
+    return -1;
+  }
+  conf_t *conf = conf_alloc(conf_file);
+  assert(conf != NULL);
+
+  json_t *json_db_name = conf_search(cf, "db_name");
+  json_t *json_db_path = conf_search(cf, "db_path");
+  json_t *json_thread_num = conf_search(cf, "thread_num");
+
+  int  thread_num= json_integer_value(json_thread_num);
+  char *db_name = json_string_value(json_db_name);
+  char *db_path = json_string_value(json_db_path);
+  
   log_init(NULL);
-  kv_db_t *db = kv_db_alloc(argv[1], argv[2]);
+  kv_db_t *db = kv_db_alloc(db_name, db_path);
   assert(db != NULL);
   server_thread_t **srv_threads = calloc(n, sizeof(server_thread_t *));
 
-  for (int i = 0; i < n; i++)
+  for (int i = 0; i < thread_num; i++)
   {
-    server_t *drpc_server = server_alloc(DRPC_SERVER_TYPE, i,kv_drpc_handlers[0].handler, db);
+    server_t *drpc_server = server_alloc(DRPC_SERVER_TYPE, i, kv_drpc_handlers[0].handler, db);
     srv_threads[i] = server_thread_alloc(drpc_server);
   }
-  for (int i = 0; i < n; i++)
+  for (int i = 0; i < thread_num; i++)
   {
     server_free(srv_threads[i]->srv);
     server_thread_free(srv_threads[i]);
