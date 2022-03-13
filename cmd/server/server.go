@@ -16,8 +16,8 @@ import (
 )
 
 var (
-	sockFile = flag.String("s", "/tmp/drpc_socket.sock", "local socekt file")
 	port     = flag.Int("p", 50051, "The server port")
+	threadNum = flag.Int("n",1,"default thread worker")
 )
 
 const (
@@ -42,7 +42,7 @@ func main() {
 	}
 	s := grpc.NewServer()
 
-	confService := conf_service.NewConfService(*sockFile)
+	confService := conf_service.NewConfService(*threadNum)
 	pb.RegisterDrpcServiceServer(s,confService)
 	log.Printf("server listening at %v", lis.Addr())
 	go func() {
