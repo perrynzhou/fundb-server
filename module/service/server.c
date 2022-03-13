@@ -19,11 +19,11 @@
 #include <sys/epoll.h>
 #include <errno.h>
 #include <ev.h>
-static void not_blocked(EV_P_ ev_periodic *w, int revents)
+static void not_blocked(struct ev_loop *loop,ev_periodic *w, int revents)
 {
     fprintf(stdout, "i'm not blocked\n");
 }
-static void server_cb(EV_P_ ev_io *w, int revents)
+static void server_cb(struct ev_loop *loop, ev_io *w, int revents)
 {
 
     server_t *srv = (server_t *)w;

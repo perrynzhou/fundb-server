@@ -19,8 +19,9 @@ const (
 )
 
 var (
-	addr = flag.String("s", "127.0.0.1:50051", "defaule address")
-	op   = flag.String("t", "create_schema", "default api request")
+	addr  = flag.String("s", "127.0.0.1:50051", "defaule address")
+	op    = flag.String("t", "create_schema", "default api request")
+	count = flag.Int("n", 1, "default run times")
 )
 
 func main() {
@@ -38,27 +39,27 @@ func main() {
 	defer cancel()
 	var request *pb.Request
 	var response *pb.Response
-	r := rand.Int63n(99999) % 1024
-	switch *op {
-	case "create_schema":
-		createRequest := &pb.CreateSchemaReq{
-			Name: fmt.Sprintf("schema-%d", r),
+	rand.Seed(time.Now().Unix())
+	r := rand.Int63() % 1024
+	for i := 0; i < *count; i++ {
+		switch *op {
+		case "create_schema":
+			createRequest := &pb.CreateSchemaReq{
+				Name: fmt.Sprintf("schema-%d", r+int64(rand.Int())),
+			}
+			// createRequest
+			body, _ := proto.Marshal(createRequest)
+			request = &pb.Request{
+				Method: DRPC_METHOD_CREATE_SCHEMA,
+				Body:   body,
+			}
+			response, err = c.DrpcFunc(ctx, request)
+			if err != nil {
+				log.Fatalf("could call DrpcFunc: %v", err)
+			}
+			createResp := &pb.CreateSchemaReq{}
+			proto.Unmarshal(response.Body, createResp)
+			log.Info("createResponse:", createResp)
 		}
-		// createRequest
-		body, _ := proto.Marshal(createRequest)
-		request = &pb.Request{
-			Method: DRPC_METHOD_CREATE_SCHEMA,
-			Body:   body,
-		}
-		response, err = c.DrpcFunc(ctx, request)
-		if err != nil {
-			log.Fatalf("could call DrpcFunc: %v", err)
-		}
-		createResp := &pb.CreateSchemaReq{}
-		proto.Unmarshal(response.Body, createResp)
-		log.Info("createResponse:", createResp)
-	default:
-		break
 	}
-
 }
