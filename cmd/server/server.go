@@ -16,14 +16,12 @@ import (
 	"google.golang.org/grpc"
 )
 
-
-
 const (
 	defaultConfFile = "./conf.json"
 )
-var (
-	confFile      = flag.String("c", defaultConfFile, "The server port")
 
+var (
+	confFile = flag.String("c", defaultConfFile, "The server port")
 )
 
 func init() {
@@ -35,7 +33,7 @@ func init() {
 
 func main() {
 	flag.Parse()
-	cf,err := conf.NewConf(*confFile)
+	cf, err := conf.NewConf(*confFile)
 	if err != nil {
 		return
 	}
@@ -49,7 +47,7 @@ func main() {
 	}
 	s := grpc.NewServer()
 
-	confService := service.NewConfService(cf.ThreadNum)
+	confService := service.NewConfService()
 	pb.RegisterDrpcServiceServer(s, confService)
 	log.Printf("server listening at %v", lis.Addr())
 	go func() {

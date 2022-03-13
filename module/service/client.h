@@ -15,7 +15,7 @@
 typedef struct
 {
     ev_io io;
-    int fd;
+    int cfd;
     kv_db_t *db_ctx;
     struct drpc *session_ctx;
 } client_t;

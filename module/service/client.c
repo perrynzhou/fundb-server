@@ -30,22 +30,22 @@ static void client_cb(EV_P_ ev_io *w, int revents)
         client_free(c);
     }
 }
-client_t *client_alloc(int fd)
+client_t *client_alloc(int cfd)
 {
     client_t *c = calloc(1, sizeof(client_t));
-    c->fd = fd;
+    c->cfd = cfd;
     // client->server = server;
-    setnonblock(c->fd);
-    ev_io_init(&c->io, client_cb, c->fd, EV_READ);
+    setnonblock(c->cfd);
+    ev_io_init(&c->io, client_cb, c->cfd, EV_READ);
     return c;
 }
 void client_free(client_t *c)
 {
     if (c != NULL)
     {
-        if (c->fd != -1)
+        if (c->cfd != -1)
         {
-            close(c->fd);
+            close(c->cfd);
         }
         free(c);
         c = NULL;

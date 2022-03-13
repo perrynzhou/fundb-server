@@ -18,7 +18,7 @@
 #include <fcntl.h>
 #include <sys/epoll.h>
 #include <errno.h>
-
+#include <ev.h>
 static void not_blocked(EV_P_ ev_periodic *w, int revents)
 {
     fprintf(stdout, "i'm not blocked\n");
@@ -37,7 +37,7 @@ static void server_cb(EV_P_ ev_io *w, int revents)
             client_t *c = client_alloc(session_ctx->fd);
             c->session_ctx = session_ctx;
             c->db_ctx = srv->db_ctx;
-            ev_io_start(EV_A_ & c->io);
+            ev_io_start(srv->loop, &c->io);
         }
     }
 }
@@ -49,42 +49,39 @@ inline static void remove_socket(const char *name)
         remove(name);
     }
 }
-server_t *server_alloc(int server_type, int id,drpc_handler_func handler, void *ctx)
+server_t *server_alloc(int server_type,drpc_handler_func handler, void *ctx)
 {
     server_t *srv = calloc(1, sizeof(server_t));
     assert(srv != NULL);
     char buffer[256] = {'\0'};
-    snprintf(&buffer, 256, "/tmp/%s_%d.sock", server_type_names[server_type],id);
+    snprintf(&buffer, 256, "/tmp/%s.sock", server_type_names[server_type]);
     srv->socket = strdup(&buffer);
     remove_socket(srv->socket);
     struct drpc *listener = drpc_listen(srv->socket, handler);
-    srv->fd = listener->fd;
-    log_info("active fd=%d",srv->fd);
+    srv->sfd = listener->fd;
+    log_info("active fd=%d,socket=%s",srv->sfd,srv->socket);
     srv->server_type = server_type;
     srv->listener = listener;
+    srv->loop = ev_loop_new(EVFLAG_AUTO);
     srv->db_ctx = (kv_db_t *)ctx;
     return srv;
 }
 
 void server_start(server_t *srv)
 {
-    EV_P = ev_loop_new(EVFLAG_AUTO);
-    ev_io_init(&srv->io, server_cb, srv->fd, EV_READ);
-    ev_io_start(EV_A_ & srv->io);
-    log_info("start socket at ::%s  on %ld", srv->socket, pthread_self());
-    ev_loop(EV_A_ 0);
-
-    close(srv->fd);
-    return EXIT_SUCCESS;
+    ev_io_init(&srv->io, server_cb, srv->sfd, EV_READ);
+    ev_io_start(srv->loop, &srv->io);
+    ev_loop(srv->loop, 0);
+    close(srv->sfd);
 }
 
 void server_free(server_t *srv)
 {
     if (srv != NULL)
     {
-        if (srv->fd != NULL)
+        if (srv->sfd != NULL)
         {
-            close(srv->fd);
+            close(srv->sfd);
         }
         if (srv->socket != NULL)
         {

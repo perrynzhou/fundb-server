@@ -12,6 +12,7 @@ import (
 	"net"
 	"sync"
 
+	log "github.com/sirupsen/logrus"
 	"google.golang.org/protobuf/proto"
 )
 
@@ -103,6 +104,7 @@ func (c *ClientConnection) Connect() error {
 
 	conn, err := net.DialUnix("unixpacket", nil, c.addr)
 	if err != nil {
+		log.Error("happed error:", err)
 		return errors.New("dRPC connect")
 	}
 	c.conn = conn
@@ -133,7 +135,8 @@ func (c *ClientConnection) GetSocketPath() string {
 func NewClientConnection(socket string) *ClientConnection {
 
 	addr := &net.UnixAddr{
-		Net:  "unixpacket",
+		//Net:  "unixpacket",
+		Net:  "unix",
 		Name: socket,
 	}
 

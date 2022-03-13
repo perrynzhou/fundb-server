@@ -38,10 +38,11 @@ func main() {
 	defer cancel()
 	var request *pb.Request
 	var response *pb.Response
+	r := rand.Int63n(99999) % 1024
 	switch *op {
 	case "create_schema":
 		createRequest := &pb.CreateSchemaReq{
-			Name: fmt.Sprintf("schema-%d", rand.Int63n(99999)),
+			Name: fmt.Sprintf("schema-%d", r),
 		}
 		// createRequest
 		body, _ := proto.Marshal(createRequest)
