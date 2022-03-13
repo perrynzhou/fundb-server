@@ -41,7 +41,7 @@ func main() {
 	switch *op {
 	case "create_schema":
 		createRequest := &pb.CreateSchemaReq{
-			Name: fmt.Sprintf("schema-%d", rand.Int31()),
+			Name: fmt.Sprintf("schema-%d", rand.Int63n(99999)),
 		}
 		// createRequest
 		body, _ := proto.Marshal(createRequest)
@@ -56,7 +56,6 @@ func main() {
 		createResp := &pb.CreateSchemaReq{}
 		proto.Unmarshal(response.Body, createResp)
 		log.Info("createResponse:", createResp)
-		break
 	default:
 		break
 	}

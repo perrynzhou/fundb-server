@@ -17,7 +17,7 @@ static void client_cb(EV_P_ ev_io *w, int revents)
     struct drpc *session_ctx = (struct drpc *)c->session_ctx;
     Drpc__Request *incoming;
     int result = drpc_recv_call(session_ctx, &incoming);
-    log_info("client cb result=%d",result);
+    log_info("client cb result=%d", result);
     if (result != -1)
     {
         kv_db_t *db_ctx = c->db_ctx;
@@ -26,11 +26,9 @@ static void client_cb(EV_P_ ev_io *w, int revents)
         session_ctx->handler(incoming, resp, db_ctx);
         drpc_send_response(session_ctx, resp);
         drpc_response_free(resp);
-        return;
+        ev_io_stop(EV_A_ & c->io);
+        client_free(c);
     }
-    ev_io_stop(EV_A_ & c->io);
-    close(c->fd);
-    client_free(c);
 }
 client_t *client_alloc(int fd)
 {
@@ -43,5 +41,14 @@ client_t *client_alloc(int fd)
 }
 void client_free(client_t *c)
 {
+    if (c != NULL)
+    {
+        if (c->fd != -1)
+        {
+            close(c->fd);
+        }
+        free(c);
+        c = NULL;
+    }
     // todo
 }

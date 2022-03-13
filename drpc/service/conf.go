@@ -40,28 +40,34 @@ func NewConfService(threadNum int) *ConfService {
 		confService.syncSockets = append(confService.drpcSockets, syncSockets)
 
 	}
+
 	confService.mutex = &sync.Mutex{}
 	return confService
 }
 
-func (cs *ConfService) fetchNextSocket(socketFiles []string) string {
+func (cs *ConfService) fetchRoundRobinIndex() uint64 {
 	if cs.counter >= math.MaxUint64-1 {
 		cs.mutex.Lock()
 		cs.counter = 0
 		cs.mutex.Unlock()
 	}
 	atomic.AddUint64(&cs.counter, 1)
-	index := int(cs.counter % uint64(len(socketFiles)))
-	log.Info("Round-Robin socket:",socketFiles[index])
-	return socketFiles[index]
+	return cs.counter
 
 }
 func (cs *ConfService) DrpcFunc(ctx context.Context, Req *pb.Request) (*pb.Response, error) {
+
+	roundRondIndex := cs.fetchRoundRobinIndex()
+	index := roundRondIndex % uint64(len(cs.drpcSockets))
+	c := NewClientConnection(cs.drpcSockets[index])
 	log.Info("********recv request*******")
-	log.Info("request method=", Req.Method)
-	socketFile := cs.fetchNextSocket(cs.drpcSockets)
-	c := NewClientConnection(socketFile)
-	c.Connect()
+	log.Info("request method=", Req.Method,",socket=",cs.drpcSockets[index])
+	response := &pb.Response{}
+	if err := c.Connect(); err != nil {
+		response.Body = []byte(err.Error())
+		return response, err
+	}
+	defer c.Close()
 	response, err := c.IssueCall(Req)
 	if err != nil {
 		response = &pb.Response{

@@ -17,6 +17,7 @@
 #include <sys/epoll.h>
 #include <errno.h>
 #include <pthread.h>
+#include <assert.h>
 #include "log.h"
 #include "kv_db.h"
 #include "store.h"
@@ -68,9 +69,9 @@ int main(int argc, char *argv[])
   conf_t *conf = conf_alloc(conf_file);
   assert(conf != NULL);
 
-  json_t *json_db_name = conf_search(cf, "db_name");
-  json_t *json_db_path = conf_search(cf, "db_path");
-  json_t *json_thread_num = conf_search(cf, "thread_num");
+  json_t *json_db_name = conf_search(conf, "db_name");
+  json_t *json_db_path = conf_search(conf, "db_path");
+  json_t *json_thread_num = conf_search(conf, "thread_num");
 
   int  thread_num= json_integer_value(json_thread_num);
   char *db_name = json_string_value(json_db_name);
@@ -79,7 +80,7 @@ int main(int argc, char *argv[])
   log_init(NULL);
   kv_db_t *db = kv_db_alloc(db_name, db_path);
   assert(db != NULL);
-  server_thread_t **srv_threads = calloc(n, sizeof(server_thread_t *));
+  server_thread_t **srv_threads = calloc(thread_num, sizeof(server_thread_t *));
 
   for (int i = 0; i < thread_num; i++)
   {
