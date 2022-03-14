@@ -61,7 +61,7 @@ void   drpc__response__init
 size_t drpc__response__get_packed_size
                      (const Drpc__Response *message)
 {
-  assert(message->base.descriptor == &drpc__response__descriptor);
+ assert(message->base.descriptor == &drpc__response__descriptor);
   return protobuf_c_message_get_packed_size ((const ProtobufCMessage*)(message));
 }
 size_t drpc__response__pack

@@ -18,6 +18,7 @@ typedef struct
     int cfd;
     kv_db_t *db_ctx;
     struct drpc *session_ctx;
+      struct ev_loop *loop;
 } client_t;
 
 // client impl

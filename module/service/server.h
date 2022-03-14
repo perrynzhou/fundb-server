@@ -26,8 +26,6 @@ typedef enum
 
 typedef struct
 {
-    ev_io io;
-    struct ev_loop *loop;
     struct drpc *listener;
     int server_type;
     int id;
@@ -37,7 +35,7 @@ typedef struct
     kv_db_t *db_ctx;
 } server_t;
 //  server impl
-server_t *server_alloc(int server_type, drpc_handler_func handler, void *ctx);
+server_t *server_alloc(int server_type,int id, drpc_handler_func handler, void *ctx);
 
 void server_start(server_t *srv);
 void server_free(server_t *srv);

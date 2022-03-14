@@ -1,16 +1,14 @@
 /*************************************************************************
-    > File Name: server.C
+  > File Name: server.c
   > Author:perrynzhou
   > Mail:perrynzhou@gmail.com
-  > Created Time: Wednesday, September 09, 2020 AM08:34:22
+  > Created Time: 六 11/20 13:36:21 2021
  ************************************************************************/
 
-#include "server.h"
-#include "client.h"
-#include "../drpc/drpc_util.h"
+#include <stdio.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <pthread.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netdb.h>
@@ -18,7 +16,40 @@
 #include <fcntl.h>
 #include <sys/epoll.h>
 #include <errno.h>
-#include <ev.h>
+#include <pthread.h>
+#include <assert.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netdb.h>
+#include <string.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <sys/epoll.h>
+#include <errno.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netdb.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <sys/epoll.h>
+#include <errno.h>
+
+#include "log.h"
+#include "kv_db.h"
+#include "store.h"
+#include "server.h"
+#include "conf.h"
+#define MAXEVENTS 64
+#define DEFAULT_PORT 8080
+#define MAX_CONN 16
+#define MAX_EVENTS 32
+#define BUF_SIZE 16
+#define MAX_LINE 256
+/*
+ * register events of fd to epfd
+ */
 static void epoll_ctl_add(int epfd, int fd, uint32_t events)
 {
   struct epoll_event ev;
@@ -41,51 +72,31 @@ static int setnonblocking(int sockfd)
   return 0;
 }
 
-
-inline static void remove_socket(const char *name)
+void server_run(const char *socket, kv_db_t *db)
 {
-    if (access(name, F_OK) == 0)
-    {
-        remove(name);
-    }
-}
-server_t *server_alloc(int server_type,int id,drpc_handler_func handler, void *ctx)
-{
-    server_t *srv = calloc(1, sizeof(server_t));
-    assert(srv != NULL);
-    char buffer[256] = {'\0'};
-    snprintf(&buffer, 256, "/tmp/%s_%d.sock", server_type_names[server_type],id);
-    srv->socket = strdup(&buffer);
-    remove_socket(srv->socket);
-    struct drpc *listener = drpc_listen(srv->socket, handler);
-    srv->sfd = listener->fd;
-    log_info("active fd=%d,socket=%s",srv->sfd,srv->socket);
-    srv->server_type = server_type;
-    srv->listener = listener;
-    srv->db_ctx = (kv_db_t *)ctx;
-    return srv;
-}
-
-void server_start(server_t *srv)
-{
+  int i;
+  int n;
   int epfd;
   int nfds;
   int listen_sock;
-  int max_event = 4096;
-  struct epoll_event events[max_event];
+  int conn_sock;
+  int socklen;
+
+  char buf[BUF_SIZE];
+  struct epoll_event events[MAX_EVENTS];
 
   struct epoll_event event;
-  listen_sock = srv->listener->fd;
+  struct drpc *listener_ctx = drpc_listen(socket, kv_drpc_handlers[0].handler);
+  listen_sock = listener_ctx->fd;
 
-  kv_db_t *db  = (kv_db_t *)srv->db_ctx;
   setnonblocking(listen_sock);
   epfd = epoll_create(1);
   epoll_ctl_add(epfd, listen_sock, EPOLLIN | EPOLLOUT | EPOLLET);
 
   for (;;)
   {
-    nfds = epoll_wait(epfd, events, max_event, -1);
-    for (int i = 0; i < nfds; i++)
+    nfds = epoll_wait(epfd, events, MAX_EVENTS, -1);
+    for (i = 0; i < nfds; i++)
     {
 
       if ((events[i].events & EPOLLERR) ||
@@ -98,7 +109,10 @@ void server_start(server_t *srv)
       }
       else if (listen_sock == events[i].data.fd)
       {
-        struct drpc *session_ctx = drpc_accept(srv->listener);
+        struct sockaddr in_addr;
+        char hbuf[1024], sbuf[1024];
+        socklen_t in_len = sizeof in_addr;
+        struct drpc *session_ctx = drpc_accept(listener_ctx);
         if (session_ctx == NULL || session_ctx->fd == -1)
         {
           log_info("session_ctx=%p is nil", session_ctx);
@@ -131,19 +145,33 @@ void server_start(server_t *srv)
   }
 }
 
-void server_free(server_t *srv)
+int main(int argc, char *argv[])
 {
-    if (srv != NULL)
-    {
-        if (srv->sfd != NULL)
-        {
-            close(srv->sfd);
-        }
-        if (srv->socket != NULL)
-        {
-            free(srv->socket);
-        }
-        free(srv);
-        srv = NULL;
-    }
+
+  char *conf_file = argv[1];
+  if (conf_file == NULL)
+  {
+    return -1;
+  }
+  conf_t *conf = conf_alloc(conf_file);
+  assert(conf != NULL);
+
+  json_t *json_db_name = conf_search(conf, "db_name");
+  json_t *json_db_path = conf_search(conf, "db_path");
+
+  char *db_name = json_string_value(json_db_name);
+  char *db_path = json_string_value(json_db_path);
+
+  log_init(NULL);
+  kv_db_t *db = kv_db_alloc(db_name, db_path);
+  assert(db != NULL);
+  server_run("/tmp/drpc.sock", db);
+  /*
+    server_t *srv = server_alloc(DRPC_SERVER_TYPE, kv_drpc_handlers[0].handler, db);
+    server_start(srv);
+
+    server_free(srv);
+    */
+
+  return 0;
 }

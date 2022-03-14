@@ -40,12 +40,11 @@ func main() {
 	var request *pb.Request
 	var response *pb.Response
 	rand.Seed(time.Now().Unix())
-	r := rand.Int63() % 1024
 	for i := 0; i < *count; i++ {
 		switch *op {
 		case "create_schema":
 			createRequest := &pb.CreateSchemaReq{
-				Name: fmt.Sprintf("schema-%d", r+int64(rand.Int())),
+				Name: fmt.Sprintf("schema-%d", i),
 			}
 			// createRequest
 			body, _ := proto.Marshal(createRequest)

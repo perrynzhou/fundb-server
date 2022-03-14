@@ -47,7 +47,7 @@ func main() {
 	}
 	s := grpc.NewServer()
 
-	confService := service.NewConfService()
+	confService := service.NewConfService(cf.Threads)
 	pb.RegisterDrpcServiceServer(s, confService)
 	log.Printf("server listening at %v", lis.Addr())
 	go func() {

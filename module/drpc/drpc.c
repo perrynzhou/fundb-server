@@ -101,6 +101,7 @@ drpc_response_create(Drpc__Request *call)
 		return NULL;
 
 	drpc__response__init(resp);
+	resp->base.descriptor =  &drpc__response__descriptor;
 	if (call == NULL)
 		resp->sequence = -1;
 	else
@@ -482,7 +483,6 @@ drpc_accept(struct drpc *listener_ctx)
 	{
 		return NULL;
 	}
-
 	init_drpc_ctx(session_ctx, fd, listener_ctx->handler);
 	return session_ctx;
 }
@@ -493,9 +493,9 @@ send_response(struct drpc *ctx, Drpc__Response *response)
 	int rc;
 	size_t buffer_len;
 	uint8_t *buffer;
-
+    assert(response !=NULL);
 	buffer_len = drpc__response__get_packed_size(response);
-
+     
 	D_ALLOC(buffer, buffer_len);
 	if (buffer == NULL)
 		return -1;
@@ -530,13 +530,10 @@ get_incoming_call(struct drpc *ctx, Drpc__Request **call)
 
 	*call = drpc__request__unpack(&alloc.alloc, message_len, buffer);
 	D_FREE(buffer);
-	if (alloc.oom)
-		return -1;
-	if (*call == NULL)
+	if (alloc.oom || *call==NULL)
 	{
 		return -1;
 	}
-
 	return 0;
 }
 

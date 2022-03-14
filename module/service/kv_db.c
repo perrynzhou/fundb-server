@@ -28,7 +28,6 @@ kv_schema_t *kv_schema_alloc(const char *schema_name, void *ctx,bool is_force_dr
 
   kv_schema_t *schema = (kv_schema_t *)calloc(1, sizeof(kv_schema_t) + schema_sz + 1);
   assert(schema != NULL);
- //assert(db->conn->reconfigure(db->conn,"session_max=40000")!=-1);
   assert(db->conn->open_session(db->conn, NULL, NULL, &schema->session) != -1);
   char schema_buf[256] = {'\0'};
   snprintf(&schema_buf, 256, "table:%s", schema_name);
@@ -37,12 +36,13 @@ kv_schema_t *kv_schema_alloc(const char *schema_name, void *ctx,bool is_force_dr
       assert(schema->session->drop(schema->session, &schema_buf, schema_format) != -1);
   }
   assert(schema->session->create(schema->session, &schema_buf, schema_format) != -1);
-  assert(schema->session->open_cursor(schema->session, &schema_buf, NULL, "overwrite=false", &schema->cursor) != -1);
+  assert(schema->session->open_cursor(schema->session, &schema_buf, NULL,NULL, &schema->cursor) != -1);
   strncpy((char *)&schema->schema_name, schema_name, schema_sz);
   schema->schema_name[schema_sz] = '\0';
   schema->ctx = ctx;
   schema->schema_format = strdup(schema_format);
   fprintf(stdout, "create schema %s succ\n", (char *)&schema->schema_name);
+
   return schema;
 }
 void kv_schema_destroy(kv_schema_t *schema)
@@ -73,7 +73,7 @@ kv_db_t *kv_db_alloc(const char *database_name, const char *database_dir)
 
     kv_db_t *db = calloc(1, sizeof(kv_db_t));
     assert(db != NULL);
-    assert(wiredtiger_open(&base_path, NULL, "create,salvage=false,session_max=40000,session_scratch_max=2MB", &db->conn) != -1);
+    assert(wiredtiger_open(&base_path, NULL, "create,session_max=400", &db->conn) != -1);
 
     db->database_name = strdup(database_name);
     db->database_dir = strdup(database_dir);

@@ -11,9 +11,10 @@ const (
 )
 
 type Conf struct {
-	DBName string `json:"db_name"`
-	DBPath string `json:"db_path"`
-	Port   int    `json:"server_port"`
+	Threads int    `json:"thread_num"`
+	DBName  string `json:"db_name"`
+	DBPath  string `json:"db_path"`
+	Port    int    `json:"server_port"`
 }
 
 func NewConf(path string) (*Conf, error) {
@@ -30,6 +31,7 @@ func NewConf(path string) (*Conf, error) {
 func GenConfTemplate() error {
 	cf := &Conf{}
 	cf.Port = 50051
+	cf.Threads = 2
 	cf.DBPath = "/tmp"
 	cf.DBName = "demo"
 	b, err := json.MarshalIndent(cf, " ", " ")

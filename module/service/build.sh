@@ -1,3 +1,4 @@
-protoc  -I  ../../proto --c_out=. conf.proto
+rm -rf /tmp/*
+ulimit  -c unlimited
+mkdir /tmp/core
 make
-

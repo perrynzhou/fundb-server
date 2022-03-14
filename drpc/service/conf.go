@@ -3,7 +3,9 @@ package service
 import (
 	"conf-server/drpc/pb"
 	"context"
+	"errors"
 	"fmt"
+	"sync/atomic"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -14,33 +16,43 @@ const (
 
 type ConfService struct {
 	pb.UnimplementedDrpcServiceServer
-	drpcSocket string
+	drpcSockets []string
+	count       uint64
 }
 
-func NewConfService() *ConfService {
-	confService := &ConfService{}
-	confService.drpcSocket = fmt.Sprintf("/tmp/%s.sock", drpcSockName)
+func NewConfService(threadNum int) *ConfService {
+	confService := &ConfService{
+		drpcSockets: make([]string, 0),
+	}
+	for i := 0; i < threadNum; i++ {
+		drpcSocket := fmt.Sprintf("/tmp/%s_%d.sock", drpcSockName, i)
+		confService.drpcSockets = append(confService.drpcSockets, drpcSocket)
+		log.Info("run sock:", drpcSocket)
+	}
 	return confService
 }
 
 func (cs *ConfService) DrpcFunc(ctx context.Context, Req *pb.Request) (*pb.Response, error) {
 
-	c := NewClientConnection(cs.drpcSocket)
-	log.Info("********recv request*******")
-	log.Info("request method=", Req.Method, ",socket=", cs.drpcSocket)
-	response := &pb.Response{}
+	index := int(cs.count % uint64(len(cs.drpcSockets)))
+	atomic.AddUint64(&cs.count, 1)
+	c := NewClientConnection(cs.drpcSockets[index])
+	if c == nil {
+		return &pb.Response{}, errors.New("init connection failed")
+	}
 	if err := c.Connect(); err != nil {
-		response.Body = []byte(err.Error())
-		log.Info("err:", err)
-		return response, err
+		return &pb.Response{}, err
+
 	}
 	defer c.Close()
+	log.Info("********recv request*******")
+	log.Info("request method=", Req.Method, ",socket=", cs.drpcSockets[index])
 	response, err := c.IssueCall(Req)
+
 	if err != nil {
 		response = &pb.Response{
 			Body: []byte(err.Error()),
 		}
 	}
 	return response, err
-
 }

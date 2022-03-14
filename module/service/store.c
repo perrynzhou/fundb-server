@@ -49,6 +49,7 @@ static void create_schema(Drpc__Request *drpc_req, Drpc__Response *drpc_resp, vo
     resp->code = -1;
     resp->msg = "fail";
   }
+
   size_t resp_len = kv__create_schema_resp__get_packed_size(resp);
   uint8_t *buf;
   D_ALLOC(buf, resp_len);

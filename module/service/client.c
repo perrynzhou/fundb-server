@@ -11,7 +11,7 @@
 #include "util.h"
 #include "log.h"
 #include <stdlib.h>
-static void client_cb(EV_P_ ev_io *w, int revents)
+static void client_cb(  struct ev_loop *loop, ev_io *w, int revents)
 {
     client_t *c = (struct client_t *)w;
     struct drpc *session_ctx = (struct drpc *)c->session_ctx;
@@ -26,7 +26,8 @@ static void client_cb(EV_P_ ev_io *w, int revents)
         session_ctx->handler(incoming, resp, db_ctx);
         drpc_send_response(session_ctx, resp);
         drpc_response_free(resp);
-        ev_io_stop(EV_A_ & c->io);
+        drpc_call_free(incoming);
+        ev_io_stop(c->loop,& c->io);
         client_free(c);
     }
 }
