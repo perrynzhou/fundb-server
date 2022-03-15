@@ -1,11 +1,11 @@
 package main
 
 import (
-	"fundb-server/drpc/pb"
 	"context"
 	_ "encoding/json"
 	"flag"
 	"fmt"
+	"fundb-server/drpc/pb"
 	"math/rand"
 	"time"
 
@@ -17,6 +17,7 @@ import (
 
 const (
 	DRPC_METHOD_CREATE_SCHEMA = 201
+	DRPC_METHOD_DROP_SCHEMA   = 202
 )
 
 var (
@@ -43,6 +44,23 @@ func main() {
 	rand.Seed(time.Now().Unix())
 	for i := 0; i < *count; i++ {
 		switch *op {
+		case "drop_schema":
+			dropRequest := &pb.DropSchemaReq{
+				Name: fmt.Sprintf("schema-%d", i),
+			}
+			// createRequest
+			body, _ := proto.Marshal(dropRequest)
+			request = &pb.Request{
+				Method: DRPC_METHOD_DROP_SCHEMA,
+				Body:   body,
+			}
+			response, err = c.DrpcFunc(ctx, request)
+			if err != nil {
+				log.Fatalf("could call DrpcFunc: %v", err)
+			}
+			dropResp := &pb.DropSchemaResp{}
+			proto.Unmarshal(response.Body, dropResp)
+			log.Info(dropResp)
 		case "create_schema":
 			createRequest := &pb.CreateSchemaReq{
 				Name: fmt.Sprintf("schema-%d", i),
