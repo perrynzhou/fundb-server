@@ -1,4 +1,4 @@
-module conf-server
+module fundb-server
 
 go 1.17
 

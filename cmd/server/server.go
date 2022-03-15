@@ -1,12 +1,12 @@
 package main
 
 import (
-	"conf-server/conf"
-	"conf-server/drpc/pb"
-	"conf-server/drpc/service"
-	"conf-server/util"
 	"flag"
 	"fmt"
+	"fundb-server/conf"
+	"fundb-server/drpc/dbservice"
+	"fundb-server/drpc/pb"
+	"fundb-server/util"
 	"net"
 	"os"
 	"os/signal"
@@ -47,7 +47,7 @@ func main() {
 	}
 	s := grpc.NewServer()
 
-	confService := service.NewConfService(cf.Threads)
+	confService := dbservice.NewDbService(cf.Threads)
 	pb.RegisterDrpcServiceServer(s, confService)
 	log.Printf("server listening at %v", lis.Addr())
 	go func() {

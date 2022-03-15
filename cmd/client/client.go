@@ -1,7 +1,7 @@
 package main
 
 import (
-	"conf-server/drpc/pb"
+	"fundb-server/drpc/pb"
 	"context"
 	_ "encoding/json"
 	"flag"

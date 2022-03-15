@@ -1,7 +1,7 @@
-package service
+package dbservice
 
 import (
-	"conf-server/drpc/pb"
+	"fundb-server/drpc/pb"
 	"context"
 	"errors"
 	"fmt"
@@ -14,25 +14,25 @@ const (
 	drpcSockName = "drpc"
 )
 
-type ConfService struct {
+type DbService struct {
 	pb.UnimplementedDrpcServiceServer
 	drpcSockets []string
 	count       uint64
 }
 
-func NewConfService(threadNum int) *ConfService {
-	confService := &ConfService{
+func NewDbService(threadNum int) *DbService {
+	dbService := &DbService{
 		drpcSockets: make([]string, 0),
 	}
 	for i := 0; i < threadNum; i++ {
 		drpcSocket := fmt.Sprintf("/tmp/%s_%d.sock", drpcSockName, i)
-		confService.drpcSockets = append(confService.drpcSockets, drpcSocket)
+		dbService.drpcSockets = append(dbService.drpcSockets, drpcSocket)
 		log.Info("run sock:", drpcSocket)
 	}
-	return confService
+	return dbService
 }
 
-func (cs *ConfService) DrpcFunc(ctx context.Context, Req *pb.Request) (*pb.Response, error) {
+func (cs *DbService) DrpcFunc(ctx context.Context, Req *pb.Request) (*pb.Response, error) {
 
 	index := int(cs.count % uint64(len(cs.drpcSockets)))
 	atomic.AddUint64(&cs.count, 1)

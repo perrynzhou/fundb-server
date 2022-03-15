@@ -4,11 +4,11 @@
 // SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 
-package service
+package dbservice
 
 import (
-	"conf-server/drpc/pb"
 	"errors"
+	"fundb-server/drpc/pb"
 	"net"
 	"sync"
 
