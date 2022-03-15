@@ -101,7 +101,6 @@ drpc_response_create(Drpc__Request *call)
 		return NULL;
 
 	drpc__response__init(resp);
-	resp->base.descriptor =  &drpc__response__descriptor;
 	if (call == NULL)
 		resp->sequence = -1;
 	else
@@ -471,16 +470,19 @@ drpc_accept(struct drpc *listener_ctx)
 
 	if (!drpc_is_valid_listener(listener_ctx))
 	{
+		fprintf(stdout,".....drpc_is_valid_listener.....\n");
 		return NULL;
 	}
 
 	D_ALLOC_PTR(session_ctx);
-	if (session_ctx == NULL)
+	if (session_ctx == NULL) {
+		fprintf(stdout,".....D_ALLOC_PTR.....\n");
 		return NULL;
-
+	}
 	int fd = unixcomm_accept(listener_ctx->fd);
 	if (fd <= 0)
 	{
+		fprintf(stdout,".....unixcomm_accept.....:%s\n",strerror(errno));
 		return NULL;
 	}
 	init_drpc_ctx(session_ctx, fd, listener_ctx->handler);

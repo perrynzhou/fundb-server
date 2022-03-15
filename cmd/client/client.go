@@ -3,6 +3,7 @@ package main
 import (
 	"conf-server/drpc/pb"
 	"context"
+	_ "encoding/json"
 	"flag"
 	"fmt"
 	"math/rand"
@@ -56,9 +57,17 @@ func main() {
 			if err != nil {
 				log.Fatalf("could call DrpcFunc: %v", err)
 			}
-			createResp := &pb.CreateSchemaReq{}
+			createResp := &pb.CreateSchemaResp{}
 			proto.Unmarshal(response.Body, createResp)
-			log.Info("createResponse:", createResp)
+			log.Info(createResp)
+			/*
+				b, err := json.MarshalIndent(createResp, " ", " ")
+				if err != nil {
+					log.Error(err)
+				} else {
+					log.Info("createResponse:", string(b))
+				}
+			*/
 		}
 	}
 }
