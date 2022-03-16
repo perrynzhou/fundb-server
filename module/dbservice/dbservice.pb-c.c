@@ -1019,7 +1019,7 @@ const ProtobufCMessageDescriptor dbservice__get_kv_req__descriptor =
   (ProtobufCMessageInit) dbservice__get_kv_req__init,
   NULL,NULL,NULL    /* reserved[123] */
 };
-static const ProtobufCFieldDescriptor dbservice__get_kv_resp__field_descriptors[3] =
+static const ProtobufCFieldDescriptor dbservice__get_kv_resp__field_descriptors[5] =
 {
   {
     "schema_name",
@@ -1057,16 +1057,42 @@ static const ProtobufCFieldDescriptor dbservice__get_kv_resp__field_descriptors[
     0,             /* flags */
     0,NULL,NULL    /* reserved1,reserved2, etc */
   },
+  {
+    "code",
+    4,
+    PROTOBUF_C_LABEL_NONE,
+    PROTOBUF_C_TYPE_INT32,
+    0,   /* quantifier_offset */
+    offsetof(Dbservice__GetKvResp, code),
+    NULL,
+    NULL,
+    0,             /* flags */
+    0,NULL,NULL    /* reserved1,reserved2, etc */
+  },
+  {
+    "msg",
+    5,
+    PROTOBUF_C_LABEL_NONE,
+    PROTOBUF_C_TYPE_STRING,
+    0,   /* quantifier_offset */
+    offsetof(Dbservice__GetKvResp, msg),
+    NULL,
+    &protobuf_c_empty_string,
+    0,             /* flags */
+    0,NULL,NULL    /* reserved1,reserved2, etc */
+  },
 };
 static const unsigned dbservice__get_kv_resp__field_indices_by_name[] = {
+  3,   /* field[3] = code */
   1,   /* field[1] = key */
+  4,   /* field[4] = msg */
   0,   /* field[0] = schema_name */
   2,   /* field[2] = value */
 };
 static const ProtobufCIntRange dbservice__get_kv_resp__number_ranges[1 + 1] =
 {
   { 1, 0 },
-  { 0, 3 }
+  { 0, 5 }
 };
 const ProtobufCMessageDescriptor dbservice__get_kv_resp__descriptor =
 {
@@ -1076,7 +1102,7 @@ const ProtobufCMessageDescriptor dbservice__get_kv_resp__descriptor =
   "Dbservice__GetKvResp",
   "dbservice",
   sizeof(Dbservice__GetKvResp),
-  3,
+  5,
   dbservice__get_kv_resp__field_descriptors,
   dbservice__get_kv_resp__field_indices_by_name,
   1,  dbservice__get_kv_resp__number_ranges,
@@ -1134,11 +1160,23 @@ const ProtobufCMessageDescriptor dbservice__del_kv_req__descriptor =
   (ProtobufCMessageInit) dbservice__del_kv_req__init,
   NULL,NULL,NULL    /* reserved[123] */
 };
-static const ProtobufCFieldDescriptor dbservice__del_kv_resp__field_descriptors[3] =
+static const ProtobufCFieldDescriptor dbservice__del_kv_resp__field_descriptors[4] =
 {
   {
-    "schema_name",
+    "code",
     1,
+    PROTOBUF_C_LABEL_NONE,
+    PROTOBUF_C_TYPE_INT32,
+    0,   /* quantifier_offset */
+    offsetof(Dbservice__DelKvResp, code),
+    NULL,
+    NULL,
+    0,             /* flags */
+    0,NULL,NULL    /* reserved1,reserved2, etc */
+  },
+  {
+    "schema_name",
+    3,
     PROTOBUF_C_LABEL_NONE,
     PROTOBUF_C_TYPE_STRING,
     0,   /* quantifier_offset */
@@ -1150,7 +1188,7 @@ static const ProtobufCFieldDescriptor dbservice__del_kv_resp__field_descriptors[
   },
   {
     "key",
-    2,
+    4,
     PROTOBUF_C_LABEL_NONE,
     PROTOBUF_C_TYPE_STRING,
     0,   /* quantifier_offset */
@@ -1162,7 +1200,7 @@ static const ProtobufCFieldDescriptor dbservice__del_kv_resp__field_descriptors[
   },
   {
     "value",
-    3,
+    5,
     PROTOBUF_C_LABEL_NONE,
     PROTOBUF_C_TYPE_STRING,
     0,   /* quantifier_offset */
@@ -1174,14 +1212,16 @@ static const ProtobufCFieldDescriptor dbservice__del_kv_resp__field_descriptors[
   },
 };
 static const unsigned dbservice__del_kv_resp__field_indices_by_name[] = {
-  1,   /* field[1] = key */
-  0,   /* field[0] = schema_name */
-  2,   /* field[2] = value */
+  0,   /* field[0] = code */
+  2,   /* field[2] = key */
+  1,   /* field[1] = schema_name */
+  3,   /* field[3] = value */
 };
-static const ProtobufCIntRange dbservice__del_kv_resp__number_ranges[1 + 1] =
+static const ProtobufCIntRange dbservice__del_kv_resp__number_ranges[2 + 1] =
 {
   { 1, 0 },
-  { 0, 3 }
+  { 3, 1 },
+  { 0, 4 }
 };
 const ProtobufCMessageDescriptor dbservice__del_kv_resp__descriptor =
 {
@@ -1191,10 +1231,10 @@ const ProtobufCMessageDescriptor dbservice__del_kv_resp__descriptor =
   "Dbservice__DelKvResp",
   "dbservice",
   sizeof(Dbservice__DelKvResp),
-  3,
+  4,
   dbservice__del_kv_resp__field_descriptors,
   dbservice__del_kv_resp__field_indices_by_name,
-  1,  dbservice__del_kv_resp__number_ranges,
+  2,  dbservice__del_kv_resp__number_ranges,
   (ProtobufCMessageInit) dbservice__del_kv_resp__init,
   NULL,NULL,NULL    /* reserved[123] */
 };

@@ -27,7 +27,7 @@ const (
 
 var (
 	addr  = flag.String("s", "127.0.0.1:50051", "defaule address")
-	op    = flag.String("t", "create_schema", "default api request")
+	op    = flag.String("t", "create_schema", "default api request(create_schmea,drop_schmea,put_kv,get_kv")
 	count = flag.Int("n", 1, "default run times")
 )
 
@@ -55,6 +55,24 @@ func main() {
 	rand.Seed(time.Now().Unix())
 	for i := 0; i < *count; i++ {
 		switch *op {
+		case "get_kv":
+			getKvRequest := &pb.GetKvReq{
+				SchemaName: fmt.Sprintf("schema-%d", i),
+				Key:        fmt.Sprintf("key-%d", i),
+			}
+			// createRequest
+			body, _ := proto.Marshal(getKvRequest)
+			request = &pb.Request{
+				Method: DRPC_METHOD_GET_KV,
+				Body:   body,
+			}
+			response, err = c.DrpcFunc(ctx, request)
+			if err != nil {
+				log.Fatalf("could call DrpcFunc: %v", err)
+			}
+			getKvResp := &pb.GetKvResp{}
+			proto.Unmarshal(response.Body, getKvResp)
+			log.Info(getKvResp)
 		case "put_kv":
 			val := &TData{
 				Id:   rand.Int(),

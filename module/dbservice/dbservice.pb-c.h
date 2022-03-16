@@ -141,10 +141,12 @@ struct  _Dbservice__GetKvResp
   char *schema_name;
   char *key;
   char *value;
+  int32_t code;
+  char *msg;
 };
 #define DBSERVICE__GET_KV_RESP__INIT \
  { PROTOBUF_C_MESSAGE_INIT (&dbservice__get_kv_resp__descriptor) \
-    , (char *)protobuf_c_empty_string, (char *)protobuf_c_empty_string, (char *)protobuf_c_empty_string }
+    , (char *)protobuf_c_empty_string, (char *)protobuf_c_empty_string, (char *)protobuf_c_empty_string, 0, (char *)protobuf_c_empty_string }
 
 
 struct  _Dbservice__DelKvReq
@@ -161,13 +163,14 @@ struct  _Dbservice__DelKvReq
 struct  _Dbservice__DelKvResp
 {
   ProtobufCMessage base;
+  int32_t code;
   char *schema_name;
   char *key;
   char *value;
 };
 #define DBSERVICE__DEL_KV_RESP__INIT \
  { PROTOBUF_C_MESSAGE_INIT (&dbservice__del_kv_resp__descriptor) \
-    , (char *)protobuf_c_empty_string, (char *)protobuf_c_empty_string, (char *)protobuf_c_empty_string }
+    , 0, (char *)protobuf_c_empty_string, (char *)protobuf_c_empty_string, (char *)protobuf_c_empty_string }
 
 
 /* Dbservice__CreateSchemaReq methods */

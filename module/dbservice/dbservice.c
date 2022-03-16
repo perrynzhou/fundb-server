@@ -26,6 +26,42 @@ enum drpc_kv_method
 
 };
 
+static void dbservice_get_kv(Drpc__Request *drpc_req, Drpc__Response *drpc_resp, void *ctx)
+{
+  kv_db_t *db = (kv_db_t *)ctx;
+  struct drpc_alloc alloc = PROTO_ALLOCATOR_INIT(alloc);
+  Dbservice__GetKvReq *req = dbservice__get_kv_req__unpack(&alloc.alloc, drpc_req->body.len, drpc_req->body.data);
+  Dbservice__GetKvResp resp = DBSERVICE__GET_KV_RESP__INIT;
+  log_info("*******************dbservice_get_kv**************");
+  log_info("request schmea=%s,key=%s", req->schema_name, req->key);
+  char msg_buf[2048] = {'\0'};
+  schema_meta_rec_t *meta = dict_get(db->schmea_meta_cache, req->schema_name);
+  if (meta == NULL)
+  {
+    resp.code = -1;
+    snprintf(&msg_buf, 2048, "failed: schema %s not found", req->schema_name);
+    resp.msg = &msg_buf;
+  }
+  else
+  {
+    size_t key_size = strlen(req->key);
+    char *value = (char *)kv_db_get(db, req->schema_name, req->key, key_size);
+    resp.schema_name = req->schema_name;
+    resp.key = req->key;
+    resp.value = value;
+  }
+  size_t resp_len = dbservice__get_kv_resp__get_packed_size(&resp);
+  uint8_t *buf;
+  D_ALLOC(buf, resp_len);
+  if (buf != NULL)
+  {
+    dbservice__get_kv_resp__pack(&resp, buf);
+    drpc_resp->body.len = resp_len;
+    drpc_resp->body.data = buf;
+  }
+  dbservice__get_kv_req__free_unpacked(req, &alloc.alloc);
+}
+
 static void dbservice_put_kv(Drpc__Request *drpc_req, Drpc__Response *drpc_resp, void *ctx)
 {
   kv_db_t *db = (kv_db_t *)ctx;
@@ -44,7 +80,7 @@ static void dbservice_put_kv(Drpc__Request *drpc_req, Drpc__Response *drpc_resp,
   else
   {
     size_t key_size = strlen(req->key);
-
+    size_t value_size = strlen(req->value);
     if (kv_db_search(db, req->schema_name, req->key, key_size) != -1)
     {
       resp.code = -1;
@@ -58,6 +94,7 @@ static void dbservice_put_kv(Drpc__Request *drpc_req, Drpc__Response *drpc_resp,
       __sync_fetch_and_add(&last_meta->kv_count, 1);
       __sync_fetch_and_add(&last_meta->bytes, bytes);
       schmea_meta_save(req->schema_name, req->key, last_meta, sizeof(*last_meta), db);
+      kv_db_set(db,req->schema_name,req->key,key_size,req->value,value_size);
       resp.code = 0;
       snprintf(&msg_buf, 2048, "succ: put key %s  ok", req->key);
       resp.msg = &msg_buf;
@@ -95,7 +132,7 @@ static void dbservice_create_schema(Drpc__Request *drpc_req, Drpc__Response *drp
     if (schema != NULL)
     {
       resp.code = 0;
-      snprintf(&msg_buf, 2048,"succ: new schema %s  ok", req->name);
+      snprintf(&msg_buf, 2048, "succ: new schema %s  ok", req->name);
 
       resp.msg = &msg_buf;
     }
@@ -172,6 +209,9 @@ void process_drpc_request(Drpc__Request *drpc_req, Drpc__Response *drpc_resp, vo
     dbservice_drop_schema(drpc_req, drpc_resp, ctx);
   case DRPC_METHOD_PUT_KV:
     dbservice_put_kv(drpc_req, drpc_resp, ctx);
+  case DRPC_METHOD_GET_KV:
+    dbservice_get_kv(drpc_req, drpc_resp, ctx);
+    break;
   default:
     break;
   }
