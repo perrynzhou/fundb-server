@@ -23,9 +23,8 @@ typedef struct
   WT_SESSION *session;
   WT_CURSOR *cursor;
   void *ctx;
-  char *schema_format;
-  char *schema_name;
-  char  *real_name;
+  char *uri;
+  char  *name;
 } kv_schema_t;
 
 typedef struct

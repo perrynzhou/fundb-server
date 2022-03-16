@@ -11,6 +11,7 @@
 #include <fcntl.h>
 #include <assert.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include "kv_db.h"
 #include "hashfn.h"
 #include "log.h"
@@ -40,11 +41,10 @@ kv_schema_t *kv_schema_alloc(const char *schema_name, void *ctx, bool is_force_d
   }
   assert(schema->session->create(schema->session, &schema_buf, schema_format) != -1);
   assert(schema->session->open_cursor(schema->session, &schema_buf, NULL, NULL, &schema->cursor) != -1);
-  schema->schema_name = strdup(&schema_buf);
-  schema->real_name = strdup(schema_name);
+  schema->uri = strdup(&schema_buf);
+  schema->name = strdup(schema_name);
   schema->ctx = ctx;
-  schema->schema_format = strdup(schema_format);
-  fprintf(stdout, "create::schema %s succ\n", schema->schema_name);
+  fprintf(stdout, "create::schema %s succ\n", schema->uri);
   kv_db_register_schema(db, schema);
   return schema;
 }
@@ -55,8 +55,10 @@ void kv_schema_destroy(kv_schema_t *schema)
     kv_db_t *db = (kv_db_t *)schema->ctx;
     kv_db_unregister_schema(db, schema);
     schema->cursor->close(schema->cursor);
-    // schema->session->drop(schema->session,&schema->schema_name,schema->schema_format);
+    schema->session->drop(schema->session, schema->uri, "remove_files=true");
     schema->session->close(schema->session, NULL);
+    free(schema->uri);
+    free(schema->name);
     free(schema);
     schema = NULL;
   }
@@ -66,15 +68,13 @@ kv_db_t *kv_db_alloc(const char *database_name, const char *database_dir)
 {
   if (database_name != NULL && database_dir != NULL)
   {
-
     char base_path[2048] = {'\0'};
     snprintf(&base_path, 2048, "%s/%s", database_dir, database_name);
     if (access(&base_path, F_OK) != 0 && mkdir(&base_path, 0755) != 0)
     {
 
-      return -1;
+      return NULL;
     }
-
     kv_db_t *db = calloc(1, sizeof(kv_db_t));
     assert(db != NULL);
     char *conn_config = "create,cache_size=4GB,session_max=50000,eviction=(threads_min=4,threads_max=8),log=(enabled=false),transaction_sync=(enabled=false),checkpoint_sync=true,checkpoint=(wait=10),statistics=(fast),statistics_log=(json,wait=1)";
@@ -150,7 +150,7 @@ int kv_db_register_schema(kv_db_t *db, kv_schema_t *schema)
   {
     return -1;
   }
-  char *schema_name = schema->real_name;
+  char *schema_name = schema->name;
   if (dict_put(db->schema_ctx, schema_name, schema) != NULL)
   {
     return 0;
@@ -160,9 +160,9 @@ int kv_db_register_schema(kv_db_t *db, kv_schema_t *schema)
 }
 void kv_db_unregister_schema(kv_db_t *db, kv_schema_t *schema)
 {
-  if (db != NULL && schema != NULL && schema->real_name != NULL)
+  if (db != NULL && schema != NULL && schema->name != NULL)
   {
-    dict_del(db->schema_ctx, schema->real_name, NULL);
+    dict_del(db->schema_ctx, schema->name, NULL);
   }
 }
 int kv_schmea_search(kv_schema_t *schema, kv_schmea_func_cb cb, void *ctx, void *dst_key, size_t dst_key_sz)
@@ -170,7 +170,7 @@ int kv_schmea_search(kv_schema_t *schema, kv_schmea_func_cb cb, void *ctx, void 
 
   WT_SESSION *session = schema->session;
   WT_CURSOR *cursor = NULL;
-  session->open_cursor(session, schema->schema_name, NULL, NULL, &cursor);
+  session->open_cursor(session, schema->uri, NULL, NULL, &cursor);
   int ret = -1;
   while ((ret = cursor->next(cursor)) == 0)
   {
@@ -183,8 +183,8 @@ int kv_schmea_search(kv_schema_t *schema, kv_schmea_func_cb cb, void *ctx, void 
     }
     ret = cursor->get_value(cursor, &val);
     char *key_str = (char *)key.data;
-    key_str[key.size] ='\0';
-    log_info("search key=%s,len=%d",key_str,key.size);
+    key_str[key.size] = '\0';
+    log_info("search key=%s,len=%d", key_str, key.size);
     if (dst_key != NULL && dst_key_sz > 0 && memcmp(key_str, dst_key, dst_key_sz))
     {
       cursor->close(cursor);

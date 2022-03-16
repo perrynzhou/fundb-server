@@ -9,10 +9,10 @@
 #define _SERVER_H
 #include "../drpc/drpc_util.h"
 #include "../drpc/drpc.pb-c.h"
-#include "kv.pb-c.h"
+#include "dbservice.pb-c.h"
 #include "log.h"
 #include "kv_db.h"
-#include "store.h"
+#include "dbservice.h"
 #include <ev.h>
 static const char *server_type_names[] = {
     "drpc",

@@ -38,7 +38,7 @@
 
 #include "log.h"
 #include "kv_db.h"
-#include "store.h"
+#include "dbservice.h"
 #include "server.h"
 #include "conf.h"
 #include "schmea_meta.h"
@@ -83,7 +83,7 @@ int main(int argc, char *argv[])
   pthread_t threads[thread_num];
   for (int i = 0; i < n; i++)
   {
-    server_t *srv = server_alloc(DRPC_SERVER_TYPE, i, kv_drpc_handlers[0].handler, db);
+    server_t *srv = server_alloc(DRPC_SERVER_TYPE, i, dbservice_drpc_handlers[0].handler, db);
     pthread_create(&threads[i], NULL, server_thread_cb, srv);
   }
   for (int i = 0; i < n; i++)
