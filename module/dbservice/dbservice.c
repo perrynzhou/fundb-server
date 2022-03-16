@@ -81,7 +81,7 @@ static void dbservice_put_kv(Drpc__Request *drpc_req, Drpc__Response *drpc_resp,
   {
     size_t key_size = strlen(req->key);
     size_t value_size = strlen(req->value);
-    if (kv_db_search(db, req->schema_name, req->key, key_size) != -1)
+    if (kv_db_search(db, req->schema_name, req->key, key_size) == 0)
     {
       resp.code = -1;
       snprintf(&msg_buf, 2048, "failed: key %s  exists", req->key);
@@ -179,7 +179,7 @@ static void dbservice_drop_schema(Drpc__Request *drpc_req, Drpc__Response *drpc_
   }
   else
   {
-    kv_schema_t *schema = kv_schema_alloc(req->name, db, false);
+    kv_schema_t *schema = kv_db_fetch_schema(db,req->name);
     kv_schema_destroy(schema);
     schmea_cache_del(db->schmea_meta_cache, db, sys_schmea_meta_name, req->name);
     resp.code = 0;
@@ -207,8 +207,10 @@ void process_drpc_request(Drpc__Request *drpc_req, Drpc__Response *drpc_resp, vo
     break;
   case DRPC_METHOD_DROP_SCHEMA:
     dbservice_drop_schema(drpc_req, drpc_resp, ctx);
+    break;
   case DRPC_METHOD_PUT_KV:
     dbservice_put_kv(drpc_req, drpc_resp, ctx);
+    break;
   case DRPC_METHOD_GET_KV:
     dbservice_get_kv(drpc_req, drpc_resp, ctx);
     break;

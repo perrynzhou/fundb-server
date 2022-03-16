@@ -30,10 +30,15 @@ int  schmea_meta_save(const char *schema_name,const char *key,void *val,size_t v
 }
 static int schema_cache_load_cb(void *ctx,void *key,void *val)
 {
-  dict_t *cache = (dict_t *)ctx;
-  schema_meta_rec_t *meta_ptr=(schema_meta_rec_t *)dict_put(cache,(char *)key,val);
-  log_info("cache::load key=%s,count=%d,active=%d",(char *)key,meta_ptr->kv_count,meta_ptr->is_active);
-  return (meta_ptr == NULL)?-1:0;
+  kv_db_t *db = (kv_db_t *)ctx;
+  kv_schema_t  *schema = kv_schema_alloc((char *)key,db,false);
+  log_info("reload schmea=%s",schema->uri);
+  schema_meta_rec_t *prev_meta = schmea_meta_fetch(sys_schmea_meta_name,(char *)key, db);
+  schema_meta_rec_t *new_meta = calloc(1,sizeof(schema_meta_rec_t));
+  schmea_meta_assign(new_meta,prev_meta->kv_count,prev_meta->bytes,prev_meta->is_active);
+  dict_put(db->schmea_meta_cache,(char *)key,new_meta);
+  log_info("cache::load key=%s,count=%d,active=%d",(char *)key,prev_meta->kv_count,prev_meta->is_active);
+  return (new_meta == NULL)?-1:0;
 }
 
 int schmea_cache_add(dict_t *cache,kv_db_t *db,char *schema_name,const char *key,void *val,size_t val_sz)
@@ -58,12 +63,12 @@ int schmea_cache_del(dict_t *cache,kv_db_t *db,char *schema_name,const char *key
   dict_del(cache,key,free);
   return 0;
 }
-dict_t *schema_cache_load(const char *meta_name,kv_db_t *db)
+int schema_cache_load(const char *meta_name,kv_db_t *db)
 {
    kv_schema_t *meta = kv_db_fetch_schema(db,meta_name);
-   dict_t *map = dict_create(SCHEMA_MAX_SIZE,NULL);
-   kv_schmea_search(meta,schema_cache_load_cb,map,NULL,0);
-   return map;
+   db->schmea_meta_cache = dict_create(SCHEMA_MAX_SIZE,NULL);
+   kv_schmea_search(meta,schema_cache_load_cb,db,NULL,0);
+   return 0;
 
 }
 

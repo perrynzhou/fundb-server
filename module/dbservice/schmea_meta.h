@@ -21,7 +21,7 @@ int schmea_meta_assign(schema_meta_rec_t *meta,uint32_t key_count,bool is_active
 schema_meta_rec_t  *schmea_meta_fetch(const char *meta_schema_name,const char *key,kv_db_t *db);
 int  schmea_meta_save(const char *schema_name,const char *key,void *val,size_t val_size,kv_db_t *db);
 
-dict_t *schema_cache_load(const char *schema_name, kv_db_t *db);
+int schema_cache_load(const char *meta_name,kv_db_t *db);
 int schmea_cache_add(dict_t *cache, kv_db_t *db, char *schema_name, const char *key, void *val, size_t val_sz);
 int schmea_cache_del(dict_t *cache, kv_db_t *db, char *schema_name, const char *key);
 

@@ -105,11 +105,7 @@ int kv_db_search(kv_db_t *db,const char *schmea_name,void *key,size_t key_sz){
   WT_ITEM key_item, value_item;
   wt_item_init(&key_item, key, key_sz);
   cursor->set_key(cursor, &key_item);
-  if (cursor->search(cursor) != 0)
-  {
-    return -1;
-  }
-  return  0;
+  return cursor->search(cursor);
 }
 void *kv_db_get(kv_db_t *db, char *schema_name, void *key, size_t key_sz)
 {
@@ -178,7 +174,7 @@ void kv_db_unregister_schema(kv_db_t *db, kv_schema_t *schema)
     dict_del(db->schema_ctx, schema->name, NULL);
   }
 }
-int kv_schmea_search(kv_schema_t *schema, kv_schmea_func_cb cb, void *ctx, void *dst_key, size_t dst_key_sz)
+int kv_schmea_search(kv_schema_t *schema, kv_schmea_func_cb cb, void *ctx,void *dst_key, size_t dst_key_sz)
 {
 
   WT_SESSION *session = schema->session;

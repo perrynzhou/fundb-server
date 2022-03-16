@@ -77,7 +77,7 @@ int main(int argc, char *argv[])
   log_init(NULL);
   kv_db_t *db = kv_db_alloc(db_name, db_path);
   kv_schema_t *schmea_meta = kv_schema_alloc(sys_schmea_meta_name, db, false);
-  db->schmea_meta_cache = schema_cache_load(sys_schmea_meta_name, db);
+  schema_cache_load(sys_schmea_meta_name, db);
   assert(db != NULL);
   int n = thread_num;
   pthread_t threads[thread_num];

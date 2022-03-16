@@ -39,7 +39,7 @@ typedef struct
 
 typedef int (*kv_schmea_func_cb)(void *ctx, void *key, void *val);
 kv_schema_t *kv_schema_alloc(const char *name, void *ctx, bool is_force_drop);
-int kv_schmea_search(kv_schema_t *schema, kv_schmea_func_cb cb, void *ctx, void *dst_key, size_t dst_key_sz);
+int kv_schmea_search(kv_schema_t *schema, kv_schmea_func_cb cb, void *ctx,void *dst_key, size_t dst_key_sz);
 void kv_schema_destroy(kv_schema_t *schema);
 
 kv_db_t *kv_db_alloc(const char *database_name, const char *database_dir);

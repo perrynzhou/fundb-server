@@ -3,10 +3,11 @@ package main
 import (
 	"context"
 	"encoding/json"
-	_ "encoding/json"
 	"flag"
 	"fmt"
+	"fundb-server/conf"
 	"fundb-server/drpc/pb"
+	"fundb-server/util"
 	"math/rand"
 	"time"
 
@@ -37,6 +38,12 @@ type TData struct {
 	Path string `json:"path"`
 }
 
+func init() {
+	logHook := util.NewHook()
+	logHook.Field = "line"
+	log.AddHook(logHook)
+	conf.GenConfTemplate()
+}
 func main() {
 	flag.Parse()
 	// Set up a connection to the server.
@@ -136,14 +143,6 @@ func main() {
 			createResp := &pb.CreateSchemaResp{}
 			proto.Unmarshal(response.Body, createResp)
 			log.Info(createResp)
-			/*
-				b, err := json.MarshalIndent(createResp, " ", " ")
-				if err != nil {
-					log.Error(err)
-				} else {
-					log.Info("createResponse:", string(b))
-				}
-			*/
 		}
 	}
 }
