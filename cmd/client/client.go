@@ -68,7 +68,7 @@ func main() {
 			}
 			putKvRequest := &pb.PutKvReq{
 				SchemaName: fmt.Sprintf("schema-%d", i),
-				Key:        fmt.Sprintf("key-%d", rand.Int31()),
+				Key:        fmt.Sprintf("key-%d", i),
 				Value:      string(b),
 			}
 			// createRequest

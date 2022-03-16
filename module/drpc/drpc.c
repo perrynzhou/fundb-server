@@ -117,7 +117,7 @@ drpc_response_create(Drpc__Request *call)
 void drpc_response_free(Drpc__Response *resp)
 {
 	struct drpc_alloc alloc = PROTO_ALLOCATOR_INIT(alloc);
-
+     
 	drpc__response__free_unpacked(resp, &alloc.alloc);
 }
 
@@ -593,8 +593,9 @@ int drpc_send_response(struct drpc *session_ctx, Drpc__Response *resp)
 	{
 		return -1;
 	}
-
-	return send_response(session_ctx, resp);
+	int ret =send_response(session_ctx, resp);
+	D_FREE(resp->body.data);
+	return ret;
 }
 
 /**

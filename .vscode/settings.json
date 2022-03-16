@@ -1,5 +1,6 @@
 {
     "files.associations": {
-        "kv.pb-c.h": "c"
+        "kv.pb-c.h": "c",
+        "drpc.h": "c"
     }
 }

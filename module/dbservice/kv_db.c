@@ -107,9 +107,9 @@ int kv_db_search(kv_db_t *db,const char *schmea_name,void *key,size_t key_sz){
   cursor->set_key(cursor, &key_item);
   if (cursor->search(cursor) != 0)
   {
-    return 0;
+    return -1;
   }
-  return  -1;
+  return  0;
 }
 void *kv_db_get(kv_db_t *db, char *schema_name, void *key, size_t key_sz)
 {

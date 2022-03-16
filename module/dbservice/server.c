@@ -6,6 +6,7 @@
  ************************************************************************/
 
 #include "server.h"
+#include "../drpc/drpc.h"
 #include "../drpc/drpc_util.h"
 #include <stdlib.h>
 #include <string.h>
