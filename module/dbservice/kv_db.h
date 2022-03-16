@@ -45,6 +45,7 @@ void kv_schema_destroy(kv_schema_t *schema);
 kv_db_t *kv_db_alloc(const char *database_name, const char *database_dir);
 kv_schema_t *kv_db_fetch_schema(kv_db_t *db, char *schema_name);
 // key and value operation
+int kv_db_search(kv_db_t *db,const char *schmea_name,void *key,size_t key_sz);
 int kv_db_set(kv_db_t *db, char *schema_name, void *key, size_t key_sz, void *val, size_t val_sz);
 void *kv_db_get(kv_db_t *db, char *schema_name, void *key, size_t key_sz);
 int kv_db_del(kv_db_t *db, char *schema_name, void *key, size_t key_sz);

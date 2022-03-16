@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	_ "encoding/json"
 	"flag"
 	"fmt"
@@ -19,7 +20,7 @@ const (
 	DRPC_METHOD_CREATE_SCHEMA = 201
 	DRPC_METHOD_DROP_SCHEMA   = 202
 
-	DRPC_METHOD_PUT_KV  = 301
+	DRPC_METHOD_PUT_KV = 301
 	DRPC_METHOD_GET_KV = 302
 	DRPC_METHOD_DEL_KV = 303
 )
@@ -29,6 +30,12 @@ var (
 	op    = flag.String("t", "create_schema", "default api request")
 	count = flag.Int("n", 1, "default run times")
 )
+
+type TData struct {
+	Id   int    `json:"id"`
+	Port int    `json:"port"`
+	Path string `json:"path"`
+}
 
 func main() {
 	flag.Parse()
@@ -48,6 +55,35 @@ func main() {
 	rand.Seed(time.Now().Unix())
 	for i := 0; i < *count; i++ {
 		switch *op {
+		case "put_kv":
+			val := &TData{
+				Id:   rand.Int(),
+				Port: rand.Intn(*count) + 4000,
+				Path: fmt.Sprintf("/tmp/data-%d", rand.Int()),
+			}
+			b, err := json.Marshal(val)
+			if err != nil {
+				log.Error(err)
+				break
+			}
+			putKvRequest := &pb.PutKvReq{
+				SchemaName: fmt.Sprintf("schema-%d", i),
+				Key:        fmt.Sprintf("key-%d", rand.Int31()),
+				Value:      string(b),
+			}
+			// createRequest
+			body, _ := proto.Marshal(putKvRequest)
+			request = &pb.Request{
+				Method: DRPC_METHOD_PUT_KV,
+				Body:   body,
+			}
+			response, err = c.DrpcFunc(ctx, request)
+			if err != nil {
+				log.Fatalf("could call DrpcFunc: %v", err)
+			}
+			putKvResp := &pb.PutKvResp{}
+			proto.Unmarshal(response.Body, putKvResp)
+			log.Info(putKvResp)
 		case "drop_schema":
 			dropRequest := &pb.DropSchemaReq{
 				Name: fmt.Sprintf("schema-%d", i),

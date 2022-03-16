@@ -76,8 +76,8 @@ int main(int argc, char *argv[])
   int thread_num = json_integer_value(json_thread_num);
   log_init(NULL);
   kv_db_t *db = kv_db_alloc(db_name, db_path);
-  kv_schema_t *schmea_meta = kv_schema_alloc(schmea_meta_name, db, false);
-  db->schmea_meta_cache = schema_cache_load(schmea_meta_name, db);
+  kv_schema_t *schmea_meta = kv_schema_alloc(sys_schmea_meta_name, db, false);
+  db->schmea_meta_cache = schema_cache_load(sys_schmea_meta_name, db);
   assert(db != NULL);
   int n = thread_num;
   pthread_t threads[thread_num];

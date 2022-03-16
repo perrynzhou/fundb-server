@@ -6,12 +6,13 @@
  ************************************************************************/
 
 #include <stdio.h>
+#include <stdlib.h>
 #include "kv_db.h"
 #include "dict.h"
 #include "log.h"
 #include "schmea_meta.h"
 #define SCHEMA_MAX_SIZE (65535)
-int schmea_meta_assign(schema_meta_t *meta,uint32_t key_count,bool is_active,uint64_t bytes)
+int schmea_meta_assign(schema_meta_rec_t *meta,uint32_t key_count,bool is_active,uint64_t bytes)
 {
   memset(meta,0,sizeof(*meta));
   meta->is_active=is_active;
@@ -19,7 +20,7 @@ int schmea_meta_assign(schema_meta_t *meta,uint32_t key_count,bool is_active,uin
   meta->bytes =bytes;
   return 0;
 }
-schema_meta_t  *schmea_meta_fetch(const char *meta_schema_name,const char *key,kv_db_t *db)
+schema_meta_rec_t  *schmea_meta_fetch(const char *meta_schema_name,const char *key,kv_db_t *db)
 {
      return  kv_db_get(db,meta_schema_name,key,strlen(key));
 }
@@ -30,15 +31,14 @@ int  schmea_meta_save(const char *schema_name,const char *key,void *val,size_t v
 static int schema_cache_load_cb(void *ctx,void *key,void *val)
 {
   dict_t *cache = (dict_t *)ctx;
-  
-  schema_meta_t *meta_ptr=(schema_meta_t *)dict_put(cache,(char *)key,val);
+  schema_meta_rec_t *meta_ptr=(schema_meta_rec_t *)dict_put(cache,(char *)key,val);
   log_info("cache::load key=%s,count=%d,active=%d",(char *)key,meta_ptr->kv_count,meta_ptr->is_active);
   return (meta_ptr == NULL)?-1:0;
 }
 
 int schmea_cache_add(dict_t *cache,kv_db_t *db,char *schema_name,const char *key,void *val,size_t val_sz)
 {
-  schema_meta_t *meta_ptr = (schema_meta_t *)val;
+  schema_meta_rec_t *meta_ptr = (schema_meta_rec_t *)val;
   log_info("cache:add key=%s,count=%d,active=%d",(char *)key,meta_ptr->kv_count,meta_ptr->is_active);
 
   int ret =kv_db_set(db,schema_name,key,strlen(key),val,val_sz);
@@ -55,7 +55,7 @@ int schmea_cache_del(dict_t *cache,kv_db_t *db,char *schema_name,const char *key
     return ret;
   }
   log_info("cache:del key=%s",(char *)key);
-  dict_del(cache,key,NULL);
+  dict_del(cache,key,free);
   return 0;
 }
 dict_t *schema_cache_load(const char *meta_name,kv_db_t *db)

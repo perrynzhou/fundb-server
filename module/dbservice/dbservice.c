@@ -33,7 +33,7 @@ static void dbservice_put_kv(Drpc__Request *drpc_req, Drpc__Response *drpc_resp,
   Dbservice__PutKvResp resp = DBSERVICE__PUT_KV_RESP__INIT;
   log_info("request schmea=%s,key=%s,val=%s", req->schema_name, req->key, req->value);
   char msg_buf[2048] = {'\0'};
-  schema_meta_t *meta = dict_get(db->schmea_meta_cache, req->schema_name);
+  schema_meta_rec_t *meta = dict_get(db->schmea_meta_cache, req->schema_name);
   if (meta == NULL)
   {
     resp.code = -1;
@@ -41,16 +41,24 @@ static void dbservice_put_kv(Drpc__Request *drpc_req, Drpc__Response *drpc_resp,
   }
   else
   {
-    size_t bytes = strlen(req->key) + strlen(req->value);
-    schema_meta_t *cur_meta = schmea_meta_fetch(schmea_meta_name, req->schema_name, db);
-    schema_meta_t new_meta;
-    __sync_fetch_and_add(&cur_meta->kv_count, 1);
-    __sync_fetch_and_add(&cur_meta->bytes, bytes);
-    schmea_meta_save(req->schema_name, req->key, cur_meta, sizeof(*cur_meta), db);
-    resp.code = 0;
-    resp.msg = "succ";
-  }
+    size_t key_size = strlen(req->key);
 
+    if (kv_db_search(db, req->schema_name, req->key, key_size) != 0)
+    {
+      resp.code = -1;
+      resp.msg = "failed:key exists";
+    }
+    else
+    {
+      size_t bytes = strlen(req->key) + strlen(req->value);
+      schema_meta_rec_t *last_meta = schmea_meta_fetch(sys_schmea_meta_name, req->schema_name, db);
+      __sync_fetch_and_add(&last_meta->kv_count, 1);
+      __sync_fetch_and_add(&last_meta->bytes, bytes);
+      schmea_meta_save(req->schema_name, req->key, last_meta, sizeof(*last_meta), db);
+      resp.code = 0;
+      resp.msg = "succ";
+    }
+  }
   size_t resp_len = dbservice__put_kv_resp__get_packed_size(&resp);
   uint8_t *buf;
   D_ALLOC(buf, resp_len);
@@ -73,14 +81,15 @@ static void dbservice_create_schema(Drpc__Request *drpc_req, Drpc__Response *drp
   char msg_buf[2048] = {'\0'};
   // void *kv_db_get(kv_db_t *db, char *schema_name, void *key,size_t key_sz);
   size_t name_sz = strlen(req->name);
-  schema_meta_t *meta = dict_get(db->schmea_meta_cache, req->name);
+  schema_meta_rec_t *meta = dict_get(db->schmea_meta_cache, req->name);
   if (meta == NULL)
   {
     kv_schema_t *schema = kv_schema_alloc(req->name, db, false);
     assert(schema != NULL);
-    schema_meta_t cur_meta;
-    schmea_meta_assign(&cur_meta, 0, true, 0);
-    schmea_cache_add(db->schmea_meta_cache, db, schmea_meta_name, req->name, &cur_meta, sizeof(cur_meta));
+    schema_meta_rec_t *cur_meta = calloc(1, sizeof(*cur_meta));
+    assert(cur_meta != NULL);
+    schmea_meta_assign(cur_meta, 0, true, 0);
+    schmea_cache_add(db->schmea_meta_cache, db, sys_schmea_meta_name, req->name, cur_meta, sizeof(*cur_meta));
     if (schema != NULL)
     {
       resp.code = 0;
@@ -117,7 +126,7 @@ static void dbservice_drop_schema(Drpc__Request *drpc_req, Drpc__Response *drpc_
   Dbservice__DropSchemaReq *req = dbservice__drop_schema_req__unpack(&alloc.alloc, drpc_req->body.len, drpc_req->body.data);
   Dbservice__DropSchemaResp resp = DBSERVICE__DROP_SCHEMA_RESP__INIT;
   log_info("drop schmea_name=%s", req->name);
-  schema_meta_t *meta = dict_get(db->schmea_meta_cache, req->name);
+  schema_meta_rec_t *meta = dict_get(db->schmea_meta_cache, req->name);
   if (meta == NULL)
   {
     resp.code = -1;
@@ -127,7 +136,7 @@ static void dbservice_drop_schema(Drpc__Request *drpc_req, Drpc__Response *drpc_
   {
     kv_schema_t *schema = kv_schema_alloc(req->name, db, false);
     kv_schema_destroy(schema);
-    schmea_cache_del(db->schmea_meta_cache, db, schmea_meta_name, req->name);
+    schmea_cache_del(db->schmea_meta_cache, db, sys_schmea_meta_name, req->name);
     resp.code = 0;
     resp.msg = "succ";
     resp.name = req->name;

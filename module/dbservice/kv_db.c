@@ -98,6 +98,19 @@ int kv_db_set(kv_db_t *db, char *schema_name, void *key, size_t key_sz, void *va
   cursor->set_value(cursor, &value_item);
   return cursor->insert(cursor);
 }
+
+int kv_db_search(kv_db_t *db,const char *schmea_name,void *key,size_t key_sz){
+  kv_schema_t *schema = (kv_schema_t *)dict_get(db->schema_ctx, schmea_name);
+  WT_CURSOR *cursor = schema->cursor;
+  WT_ITEM key_item, value_item;
+  wt_item_init(&key_item, key, key_sz);
+  cursor->set_key(cursor, &key_item);
+  if (cursor->search(cursor) != 0)
+  {
+    return 0;
+  }
+  return  -1;
+}
 void *kv_db_get(kv_db_t *db, char *schema_name, void *key, size_t key_sz)
 {
   kv_schema_t *schema = (kv_schema_t *)dict_get(db->schema_ctx, schema_name);
