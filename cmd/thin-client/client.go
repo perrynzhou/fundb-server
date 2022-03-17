@@ -30,8 +30,8 @@ const (
 var (
 	addr  = flag.String("s", "127.0.0.1:50051", "defaule address")
 	op    = flag.String("t", "create_schema", "default api request(create_schmea,drop_schema,put_kv,get_kv,del_kv,query_schmea")
-	key   = flag.String("k", "key-test", "default key ")
-	value = flag.String("v", "value-test", "default value")
+	key   = flag.String("k", "key-test", "default key as schema name ")
+	value = flag.String("v", "value-test", "default value as key value")
 )
 
 type TData struct {
@@ -117,36 +117,35 @@ func main() {
 		proto.Unmarshal(response.Body, getKvResp)
 		log.Info(getKvResp)
 	case "put_kv":
-		for j := 0; j < int(rand.Int31n(32)); j++ {
-			val := &TData{
-				Id:   rand.Int(),
-				Port: rand.Intn(8192) + 4000,
-				Path: fmt.Sprintf("/tmp/data-%d", rand.Int()),
-			}
-			b, err := json.Marshal(val)
-			if err != nil {
-				log.Error(err)
-				break
-			}
-			putKvRequest := &pb.PutKvReq{
-				SchemaName: *key,
-				Key:        *value,
-				Value:      string(b),
-			}
-			// createRequest
-			body, _ := proto.Marshal(putKvRequest)
-			request = &pb.Request{
-				Method: DRPC_METHOD_PUT_KV,
-				Body:   body,
-			}
-			response, err = c.DrpcFunc(ctx, request)
-			if err != nil {
-				log.Fatalf("could call DrpcFunc: %v", err)
-			}
-			putKvResp := &pb.PutKvResp{}
-			proto.Unmarshal(response.Body, putKvResp)
-			log.Info(putKvResp)
+		val := &TData{
+			Id:   rand.Int(),
+			Port: rand.Intn(8192) + 4000,
+			Path: fmt.Sprintf("/tmp/data-%d", rand.Int()),
 		}
+		b, err := json.Marshal(val)
+		if err != nil {
+			log.Error(err)
+			break
+		}
+		putKvRequest := &pb.PutKvReq{
+			SchemaName: *key,
+			Key:        *value,
+			Value:      string(b),
+		}
+		// createRequest
+		body, _ := proto.Marshal(putKvRequest)
+		request = &pb.Request{
+			Method: DRPC_METHOD_PUT_KV,
+			Body:   body,
+		}
+		response, err = c.DrpcFunc(ctx, request)
+		if err != nil {
+			log.Fatalf("could call DrpcFunc: %v", err)
+		}
+		putKvResp := &pb.PutKvResp{}
+		proto.Unmarshal(response.Body, putKvResp)
+		log.Info(putKvResp)
+
 	case "drop_schema":
 		dropRequest := &pb.DropSchemaReq{
 			Name: *key,
