@@ -231,8 +231,10 @@ func main() {
 		for {
 			select {
 			case <-ticker.C:
-				for k, v := range mp {
-					log.Infof("%s: total=%d,succ=%d,failed=%d\n", k, v.Total, v.Succ, v.Fail)
+				for _, v := range opTypes {
+					opName := opMap[v]
+					metric := metricMap[opName]
+					log.Infof("%s: total=%d,succ=%d,failed=%d\n", opName, metric.Total, metric.Succ, metric.Fail)
 				}
 				log.Info("\n")
 			}

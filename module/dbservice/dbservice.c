@@ -131,11 +131,13 @@ static void dbservice_put_kv(Drpc__Request *drpc_req, Drpc__Response *drpc_resp,
 
   {
     pthread_mutex_lock(&db->lock);
-    schmea_meta_rec_swap(meta, last_meta);
 
-    schmea_meta_rec_save(SYS_SCHEMA_META_TABLE_NAME, req->schema_name, last_meta, sizeof(*last_meta), db);
     log_info("schema =%s,key_count=%d,bytes=%d", req->schema_name, last_meta->kv_count, last_meta->bytes);
-    kv_db_set(db, req->schema_name, req->key, key_size, req->value, value_size);
+    if (kv_db_set(db, req->schema_name, req->key, key_size, req->value, value_size) != -1)
+    {
+      schmea_meta_rec_swap(meta, last_meta);
+      schmea_meta_rec_save(SYS_SCHEMA_META_TABLE_NAME, req->schema_name, last_meta, sizeof(*last_meta), db);
+    }
     pthread_mutex_unlock(&db->lock);
   }
   resp.code = 0;
@@ -241,7 +243,7 @@ static void dbservice_query_schema_meta(Drpc__Request *drpc_req, Drpc__Response 
   meta = schmea_meta_rec_fetch(SYS_SCHEMA_META_TABLE_NAME, req->name, db);
   if (meta == NULL)
   {
-    resp.code = 0;
+    resp.code = -1;
     snprintf((char *)&msg_buf, 2048, "failed: %s not found in meta table", req->name);
     resp.msg = (char *)&msg_buf;
     goto out;

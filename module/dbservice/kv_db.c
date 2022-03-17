@@ -85,7 +85,7 @@ kv_db_t *kv_db_alloc(const char *database_name, const char *database_dir)
     db->database_name = strdup(database_name);
     db->database_dir = strdup(database_dir);
     db->schema_ctx = dict_create(SCHEMA_LIMIT, hash_fnv1_64);
-    pthread_mutex_init(&db->lock,NULL);
+    pthread_mutex_init(&db->lock, NULL);
     return db;
   }
   return NULL;
@@ -94,13 +94,18 @@ int kv_db_set(kv_db_t *db, char *schema_name, void *key, size_t key_sz, void *va
 {
 
   kv_schema_t *schema = (kv_schema_t *)dict_get(db->schema_ctx, schema_name);
-  WT_CURSOR *cursor = schema->cursor;
-  WT_ITEM key_item, value_item;
-  wt_item_init(&key_item, key, key_sz);
-  wt_item_init(&value_item, val, val_sz);
-  cursor->set_key(cursor, &key_item);
-  cursor->set_value(cursor, &value_item);
-  return cursor->insert(cursor);
+  if (schema != NULL)
+  {
+
+    WT_CURSOR *cursor = schema->cursor;
+    WT_ITEM key_item, value_item;
+    wt_item_init(&key_item, key, key_sz);
+    wt_item_init(&value_item, val, val_sz);
+    cursor->set_key(cursor, &key_item);
+    cursor->set_value(cursor, &value_item);
+    return cursor->insert(cursor);
+  }
+  return -1;
 }
 
 int kv_db_search(kv_db_t *db, char *schmea_name, void *key, size_t key_sz)
