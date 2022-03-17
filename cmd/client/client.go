@@ -29,7 +29,7 @@ const (
 
 var (
 	addr  = flag.String("s", "127.0.0.1:50051", "defaule address")
-	op    = flag.String("t", "create_schema", "default api request(create_schmea,drop_schema,put_kv,get_kv,del_kv")
+	op    = flag.String("t", "create_schema", "default api request(create_schmea,drop_schema,put_kv,get_kv,del_kv,query_schmea")
 	count = flag.Int("n", 1, "default run times")
 )
 
