@@ -47,6 +47,7 @@ var (
 	addr     = flag.String("s", "127.0.0.1:50051", "defaule address")
 	count    = flag.Int("n", 1000, "default run times")
 	interval = flag.Int("i", 1, "default op interval millseconds")
+	op       = flag.String("t", "", "default api request(create_schmea,drop_schema,put_kv,get_kv,del_kv,query_schmea")
 )
 
 type OpMetric struct {
@@ -225,27 +226,45 @@ func main() {
 	for _, v := range opMap {
 		metricMap[v] = &OpMetric{}
 	}
-	go func(mp map[string]*OpMetric) {
+	specOpIndex := -1
+	for k, v := range opMap {
+		if v == *op {
+			specOpIndex = k
+			break
+		}
+	}
+	go func(mp map[string]*OpMetric, index int) {
 		ticker := time.NewTicker(time.Duration(1) * time.Second)
 		defer ticker.Stop()
 		for {
 			select {
 			case <-ticker.C:
-				for _, v := range opTypes {
-					opName := opMap[v]
+				if specOpIndex <= 0 {
+					for _, v := range opTypes {
+						opName := opMap[v]
+						metric := metricMap[opName]
+						log.Infof("%s: total=%d,succ=%d,failed=%d\n", opName, metric.Total, metric.Succ, metric.Fail)
+					}
+				} else {
+					opName := opMap[specOpIndex]
 					metric := metricMap[opName]
 					log.Infof("%s: total=%d,succ=%d,failed=%d\n", opName, metric.Total, metric.Succ, metric.Fail)
 				}
-				log.Info("\n")
 			}
 		}
-	}(metricMap)
+	}(metricMap, specOpIndex)
+
+	var index int
 	for {
 		select {
 		case <-ticker.C:
 			for i := 0; i < *count; i++ {
-				index := int(rand.Int31() % int32(len(opTypes)))
-				opTypeIndex := opTypes[index]
+				if specOpIndex == -1 {
+					index = int(rand.Int31() % int32(len(opTypes)))
+				} else {
+					index = specOpIndex
+				}
+				opTypeIndex := index
 				//	log.Info("begin index ", opTypeIndex, " run-", opMap[opTypeIndex])
 				var ret int32
 				switch opMap[opTypeIndex] {

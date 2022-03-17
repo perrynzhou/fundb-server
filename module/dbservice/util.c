@@ -12,7 +12,15 @@
 #include <netdb.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <sys/time.h>
+#include <sys/resource.h>
 static const char *const hex = "0123456789abcdef";
+
+int set_process_open_file_limit() 
+{
+  struct rlimit max_file_limit = {999999,1000000};
+  return setrlimit(RLIMIT_NOFILE, &max_file_limit);
+}
 int setnonblock(int fd)
 {
     int flags;

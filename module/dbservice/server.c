@@ -80,7 +80,7 @@ void server_start(server_t *srv)
   epfd = epoll_create(1);
   epoll_ctl_add(epfd, listen_sock, EPOLLIN | EPOLLOUT | EPOLLET);
 
-  for (;;)
+  while (true)
   {
     nfds = epoll_wait(epfd, events, max_event, -1);
     for (int i = 0; i < nfds; i++)
@@ -98,7 +98,7 @@ void server_start(server_t *srv)
         struct drpc *session_ctx = drpc_accept(srv->listener);
         if (session_ctx == NULL || session_ctx->fd == -1)
         {
-          log_info("session_ctx=%p is nil", session_ctx);
+          log_info("session_ctx=%p is nil,error=%s", session_ctx,strerror(errno));
           break;
         }
 
@@ -124,6 +124,7 @@ void server_start(server_t *srv)
         session_ctx->handler(incoming, resp, db);
         drpc_send_response(session_ctx, resp);
         drpc_response_free(resp);
+        close(session_ctx->fd);
       }
     }
   }
