@@ -7,7 +7,6 @@
 
 #include "server.h"
 #include "../drpc/drpc.h"
-#include "../drpc/drpc_util.h"
 #include <stdlib.h>
 #include <string.h>
 #include <pthread.h>
@@ -50,11 +49,11 @@ inline static void remove_socket(const char *name)
 }
 server_t *server_alloc(int server_type, int id, drpc_handler_func handler, void *ctx)
 {
-  server_t *srv = calloc(1, sizeof(server_t));
+  server_t *srv = (server_t *)calloc(1, sizeof(server_t));
   assert(srv != NULL);
   char buffer[256] = {'\0'};
-  snprintf(&buffer, 256, "/tmp/%s_%d.sock", server_type_names[server_type], id);
-  srv->socket = strdup(&buffer);
+  snprintf((char *)&buffer, 256, "/tmp/%s_%d.sock", server_type_names[server_type], id);
+  srv->socket = strdup((char *)&buffer);
   remove_socket(srv->socket);
   struct drpc *listener = drpc_listen(srv->socket, handler);
   srv->sfd = listener->fd;
@@ -117,7 +116,7 @@ void server_start(server_t *srv)
 
       else
       {
-        struct drpc *session_ctx = events[i].data.ptr;
+        struct drpc *session_ctx = (struct drpc *)events[i].data.ptr;
         Drpc__Request *incoming;
         int result = drpc_recv_call(session_ctx, &incoming);
         Drpc__Response *resp = drpc_response_create(incoming);
@@ -134,7 +133,7 @@ void server_free(server_t *srv)
 {
   if (srv != NULL)
   {
-    if (srv->sfd != NULL)
+    if (srv->sfd != -1)
     {
       close(srv->sfd);
     }

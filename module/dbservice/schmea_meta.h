@@ -16,13 +16,17 @@ typedef struct
   uint64_t bytes;
   bool is_active;
 } schema_meta_rec_t;
-static const char *sys_schmea_meta_name = "sys_schema_meta";
-int schmea_meta_assign(schema_meta_rec_t *meta,uint32_t key_count,bool is_active,uint64_t bytes);
-schema_meta_rec_t  *schmea_meta_fetch(const char *meta_schema_name,const char *key,kv_db_t *db);
-int  schmea_meta_save(const char *schema_name,const char *key,void *val,size_t val_size,kv_db_t *db);
 
-int schema_cache_load(const char *meta_name,kv_db_t *db);
-int schmea_cache_add(dict_t *cache, kv_db_t *db, char *schema_name, const char *key, void *val, size_t val_sz);
-int schmea_cache_del(dict_t *cache, kv_db_t *db, char *schema_name, const char *key);
+#define SYS_SCHEMA_META_TABLE_NAME "sys_schema_meta"
+int schmea_meta_rec_assign(schema_meta_rec_t *meta,uint32_t key_count,bool is_active,uint64_t bytes);
+int schmea_meta_rec_swap(schema_meta_rec_t *src,schema_meta_rec_t *dst);
+
+schema_meta_rec_t  *schmea_meta_rec_fetch(char *meta_schema_name, char *key,kv_db_t *db);
+char *schmea_meta_rec_dump(schema_meta_rec_t* rec);
+int  schmea_meta_rec_save( char *schema_name, char *key,void *val,size_t val_size,kv_db_t *db);
+
+int schema_cache_load(char *meta_name,kv_db_t *db);
+int schmea_cache_add(dict_t *cache, kv_db_t *db, char *schema_name, char *key, void *val, size_t val_sz);
+int schmea_cache_del(dict_t *cache, kv_db_t *db, char *schema_name,  char *key);
 
 #endif

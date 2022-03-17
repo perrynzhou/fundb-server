@@ -24,7 +24,9 @@ message QuerySchemaReq {
 }
 message QuerySchemaResp {
 	string name=1;
-	repeated string  meta=2;
+	int32  code=2;
+	string msg=3;
+	string  meta=4;
 }
 
 message DropSchemaReq {
@@ -69,6 +71,7 @@ message DelKvReq {
 }
 message DelKvResp {
 	int32 code=1;
+	string msg=2;
 	string schema_name=3;
 	string key=4;
 	string value=5;

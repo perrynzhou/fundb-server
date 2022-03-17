@@ -1,10 +1,10 @@
 package dbservice
 
 import (
-	"fundb-server/drpc/pb"
 	"context"
 	"errors"
 	"fmt"
+	"fundb-server/drpc/pb"
 	"sync/atomic"
 
 	log "github.com/sirupsen/logrus"
@@ -12,6 +12,26 @@ import (
 
 const (
 	drpcSockName = "drpc"
+)
+const (
+	DRPC_METHOD_CREATE_SCHEMA = 201
+	DRPC_METHOD_DROP_SCHEMA   = 202
+	DRPC_METHOD_QUERY_SCHEMA  = 203
+
+	DRPC_METHOD_PUT_KV = 301
+	DRPC_METHOD_GET_KV = 302
+	DRPC_METHOD_DEL_KV = 303
+)
+
+var (
+	opMap = map[int]string{
+		DRPC_METHOD_CREATE_SCHEMA: "create_schema",
+		DRPC_METHOD_DROP_SCHEMA:   "drop_schema",
+		DRPC_METHOD_QUERY_SCHEMA:  "query_schema",
+		DRPC_METHOD_PUT_KV:        "put_kv",
+		DRPC_METHOD_GET_KV:        "get_kv",
+		DRPC_METHOD_DEL_KV:        "del_kv",
+	}
 )
 
 type DbService struct {
@@ -46,7 +66,7 @@ func (cs *DbService) DrpcFunc(ctx context.Context, Req *pb.Request) (*pb.Respons
 	}
 	defer c.Close()
 	log.Info("********recv request*******")
-	log.Info("request method=", Req.Method, ",socket=", cs.drpcSockets[index])
+	log.Info("request method=", Req.Method, " op=", opMap[int(Req.Method)], ",socket=", cs.drpcSockets[index])
 	response, err := c.IssueCall(Req)
 
 	if err != nil {

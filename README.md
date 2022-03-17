@@ -29,7 +29,7 @@ $ cd cmd && dbserver -c conf.json
 // 请求创建创建schema
 $ cd cmd && dbclient -n 3
 //删除schema
-$ dbclient -t drop_schmea -n 3
+$ ./dbclient  -t drop_schema -n 10
 // put kv
 $ dbclient -t put_kv -n 3
 // get kv

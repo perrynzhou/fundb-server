@@ -20,6 +20,7 @@ import (
 const (
 	DRPC_METHOD_CREATE_SCHEMA = 201
 	DRPC_METHOD_DROP_SCHEMA   = 202
+	DRPC_METHOD_QUERY_SCHEMA  = 203
 
 	DRPC_METHOD_PUT_KV = 301
 	DRPC_METHOD_GET_KV = 302
@@ -28,7 +29,7 @@ const (
 
 var (
 	addr  = flag.String("s", "127.0.0.1:50051", "defaule address")
-	op    = flag.String("t", "create_schema", "default api request(create_schmea,drop_schema,put_kv,get_kv")
+	op    = flag.String("t", "create_schema", "default api request(create_schmea,drop_schema,put_kv,get_kv,del_kv")
 	count = flag.Int("n", 1, "default run times")
 )
 
@@ -62,6 +63,41 @@ func main() {
 	rand.Seed(time.Now().Unix())
 	for i := 0; i < *count; i++ {
 		switch *op {
+		case "query_schema":
+			querySchmeaRequest := &pb.QuerySchemaReq{
+				Name: fmt.Sprintf("schema-%d", i),
+			}
+			// createRequest
+			body, _ := proto.Marshal(querySchmeaRequest)
+			request = &pb.Request{
+				Method: DRPC_METHOD_QUERY_SCHEMA,
+				Body:   body,
+			}
+			response, err = c.DrpcFunc(ctx, request)
+			if err != nil {
+				log.Fatalf("could call DrpcFunc: %v", err)
+			}
+			querySchemaResp := &pb.QuerySchemaResp{}
+			proto.Unmarshal(response.Body, querySchemaResp)
+			log.Info(querySchemaResp)
+		case "del_kv":
+			delKvRequest := &pb.DelKvReq{
+				SchemaName: fmt.Sprintf("schema-%d", i),
+				Key:        fmt.Sprintf("key-%d", i),
+			}
+			// createRequest
+			body, _ := proto.Marshal(delKvRequest)
+			request = &pb.Request{
+				Method: DRPC_METHOD_DEL_KV,
+				Body:   body,
+			}
+			response, err = c.DrpcFunc(ctx, request)
+			if err != nil {
+				log.Fatalf("could call DrpcFunc: %v", err)
+			}
+			delKvResp := &pb.DelKvResp{}
+			proto.Unmarshal(response.Body, delKvResp)
+			log.Info(delKvResp)
 		case "get_kv":
 			getKvRequest := &pb.GetKvReq{
 				SchemaName: fmt.Sprintf("schema-%d", i),
@@ -81,34 +117,36 @@ func main() {
 			proto.Unmarshal(response.Body, getKvResp)
 			log.Info(getKvResp)
 		case "put_kv":
-			val := &TData{
-				Id:   rand.Int(),
-				Port: rand.Intn(*count) + 4000,
-				Path: fmt.Sprintf("/tmp/data-%d", rand.Int()),
+			for j := 0; j < int(rand.Int31n(32)); j++ {
+				val := &TData{
+					Id:   rand.Int(),
+					Port: rand.Intn(*count) + 4000,
+					Path: fmt.Sprintf("/tmp/data-%d", rand.Int()),
+				}
+				b, err := json.Marshal(val)
+				if err != nil {
+					log.Error(err)
+					break
+				}
+				putKvRequest := &pb.PutKvReq{
+					SchemaName: fmt.Sprintf("schema-%d", i),
+					Key:        fmt.Sprintf("key-%d", j),
+					Value:      string(b),
+				}
+				// createRequest
+				body, _ := proto.Marshal(putKvRequest)
+				request = &pb.Request{
+					Method: DRPC_METHOD_PUT_KV,
+					Body:   body,
+				}
+				response, err = c.DrpcFunc(ctx, request)
+				if err != nil {
+					log.Fatalf("could call DrpcFunc: %v", err)
+				}
+				putKvResp := &pb.PutKvResp{}
+				proto.Unmarshal(response.Body, putKvResp)
+				log.Info(putKvResp)
 			}
-			b, err := json.Marshal(val)
-			if err != nil {
-				log.Error(err)
-				break
-			}
-			putKvRequest := &pb.PutKvReq{
-				SchemaName: fmt.Sprintf("schema-%d", i),
-				Key:        fmt.Sprintf("key-%d", i),
-				Value:      string(b),
-			}
-			// createRequest
-			body, _ := proto.Marshal(putKvRequest)
-			request = &pb.Request{
-				Method: DRPC_METHOD_PUT_KV,
-				Body:   body,
-			}
-			response, err = c.DrpcFunc(ctx, request)
-			if err != nil {
-				log.Fatalf("could call DrpcFunc: %v", err)
-			}
-			putKvResp := &pb.PutKvResp{}
-			proto.Unmarshal(response.Body, putKvResp)
-			log.Info(putKvResp)
 		case "drop_schema":
 			dropRequest := &pb.DropSchemaReq{
 				Name: fmt.Sprintf("schema-%d", i),

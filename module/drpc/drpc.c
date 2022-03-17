@@ -20,7 +20,7 @@
 void *
 daos_drpc_alloc(void *arg, size_t size)
 {
-	struct drpc_alloc *alloc = arg;
+	struct drpc_alloc *alloc =(struct drpc_alloc *) arg;
 	void *buf;
 
 	D_ALLOC(buf, size);

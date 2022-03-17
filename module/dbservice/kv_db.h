@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <wiredtiger_ext.h>
 #include <wiredtiger.h>
+#include <pthread.h>
 #include "dict.h"
 #define SCHEMA_ENTRIES 0
 #define SCHEMA_DOCS 1
@@ -35,6 +36,7 @@ typedef struct
   WT_CONNECTION *conn;
   // struct kv_schema **schema_ctx;
   dict_t *schmea_meta_cache;
+  pthread_mutex_t lock;
 } kv_db_t;
 
 typedef int (*kv_schmea_func_cb)(void *ctx, void *key, void *val);
@@ -45,9 +47,9 @@ void kv_schema_destroy(kv_schema_t *schema);
 kv_db_t *kv_db_alloc(const char *database_name, const char *database_dir);
 kv_schema_t *kv_db_fetch_schema(kv_db_t *db, char *schema_name);
 // key and value operation
-int kv_db_search(kv_db_t *db,const char *schmea_name,void *key,size_t key_sz);
+int kv_db_search(kv_db_t *db, char *schmea_name,void *key,size_t key_sz);
 int kv_db_set(kv_db_t *db, char *schema_name, void *key, size_t key_sz, void *val, size_t val_sz);
-void *kv_db_get(kv_db_t *db, char *schema_name, void *key, size_t key_sz);
+void *kv_db_get(kv_db_t *db, char *schema_name, void *key, size_t key_sz,size_t *value_size);
 int kv_db_del(kv_db_t *db, char *schema_name, void *key, size_t key_sz);
 void *kv_db_destroy(kv_db_t *db);
 #endif

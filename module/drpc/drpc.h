@@ -29,6 +29,11 @@
 
 typedef void (*drpc_handler_func)(Drpc__Request *, Drpc__Response *,void *);
 
+struct drpc_handler
+{
+  int module_id;
+  drpc_handler_func handler;
+};
 
 
 struct drpc_alloc

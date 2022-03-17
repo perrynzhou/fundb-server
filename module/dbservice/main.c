@@ -71,13 +71,13 @@ int main(int argc, char *argv[])
   json_t *json_db_name = conf_search(conf, "db_name");
   json_t *json_db_path = conf_search(conf, "db_path");
 
-  char *db_name = json_string_value(json_db_name);
-  char *db_path = json_string_value(json_db_path);
+  const char *db_name = json_string_value(json_db_name);
+  const char *db_path = json_string_value(json_db_path);
   int thread_num = json_integer_value(json_thread_num);
   log_init(NULL);
   kv_db_t *db = kv_db_alloc(db_name, db_path);
-  kv_schema_t *schmea_meta = kv_schema_alloc(sys_schmea_meta_name, db, false);
-  schema_cache_load(sys_schmea_meta_name, db);
+  kv_schema_t *schmea_meta = kv_schema_alloc(SYS_SCHEMA_META_TABLE_NAME, db, false);
+  schema_cache_load(SYS_SCHEMA_META_TABLE_NAME, db);
   assert(db != NULL);
   int n = thread_num;
   pthread_t threads[thread_num];
@@ -88,7 +88,7 @@ int main(int argc, char *argv[])
   }
   for (int i = 0; i < n; i++)
   {
-    pthread_join(&threads[i], NULL);
+    pthread_join(threads[i], NULL);
   }
 
   return 0;

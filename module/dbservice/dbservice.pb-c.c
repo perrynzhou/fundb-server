@@ -687,7 +687,7 @@ const ProtobufCMessageDescriptor dbservice__query_schema_req__descriptor =
   (ProtobufCMessageInit) dbservice__query_schema_req__init,
   NULL,NULL,NULL    /* reserved[123] */
 };
-static const ProtobufCFieldDescriptor dbservice__query_schema_resp__field_descriptors[2] =
+static const ProtobufCFieldDescriptor dbservice__query_schema_resp__field_descriptors[4] =
 {
   {
     "name",
@@ -702,11 +702,35 @@ static const ProtobufCFieldDescriptor dbservice__query_schema_resp__field_descri
     0,NULL,NULL    /* reserved1,reserved2, etc */
   },
   {
-    "meta",
+    "code",
     2,
-    PROTOBUF_C_LABEL_REPEATED,
+    PROTOBUF_C_LABEL_NONE,
+    PROTOBUF_C_TYPE_INT32,
+    0,   /* quantifier_offset */
+    offsetof(Dbservice__QuerySchemaResp, code),
+    NULL,
+    NULL,
+    0,             /* flags */
+    0,NULL,NULL    /* reserved1,reserved2, etc */
+  },
+  {
+    "msg",
+    3,
+    PROTOBUF_C_LABEL_NONE,
     PROTOBUF_C_TYPE_STRING,
-    offsetof(Dbservice__QuerySchemaResp, n_meta),
+    0,   /* quantifier_offset */
+    offsetof(Dbservice__QuerySchemaResp, msg),
+    NULL,
+    &protobuf_c_empty_string,
+    0,             /* flags */
+    0,NULL,NULL    /* reserved1,reserved2, etc */
+  },
+  {
+    "meta",
+    4,
+    PROTOBUF_C_LABEL_NONE,
+    PROTOBUF_C_TYPE_STRING,
+    0,   /* quantifier_offset */
     offsetof(Dbservice__QuerySchemaResp, meta),
     NULL,
     &protobuf_c_empty_string,
@@ -715,13 +739,15 @@ static const ProtobufCFieldDescriptor dbservice__query_schema_resp__field_descri
   },
 };
 static const unsigned dbservice__query_schema_resp__field_indices_by_name[] = {
-  1,   /* field[1] = meta */
+  1,   /* field[1] = code */
+  3,   /* field[3] = meta */
+  2,   /* field[2] = msg */
   0,   /* field[0] = name */
 };
 static const ProtobufCIntRange dbservice__query_schema_resp__number_ranges[1 + 1] =
 {
   { 1, 0 },
-  { 0, 2 }
+  { 0, 4 }
 };
 const ProtobufCMessageDescriptor dbservice__query_schema_resp__descriptor =
 {
@@ -731,7 +757,7 @@ const ProtobufCMessageDescriptor dbservice__query_schema_resp__descriptor =
   "Dbservice__QuerySchemaResp",
   "dbservice",
   sizeof(Dbservice__QuerySchemaResp),
-  2,
+  4,
   dbservice__query_schema_resp__field_descriptors,
   dbservice__query_schema_resp__field_indices_by_name,
   1,  dbservice__query_schema_resp__number_ranges,
@@ -1160,7 +1186,7 @@ const ProtobufCMessageDescriptor dbservice__del_kv_req__descriptor =
   (ProtobufCMessageInit) dbservice__del_kv_req__init,
   NULL,NULL,NULL    /* reserved[123] */
 };
-static const ProtobufCFieldDescriptor dbservice__del_kv_resp__field_descriptors[4] =
+static const ProtobufCFieldDescriptor dbservice__del_kv_resp__field_descriptors[5] =
 {
   {
     "code",
@@ -1171,6 +1197,18 @@ static const ProtobufCFieldDescriptor dbservice__del_kv_resp__field_descriptors[
     offsetof(Dbservice__DelKvResp, code),
     NULL,
     NULL,
+    0,             /* flags */
+    0,NULL,NULL    /* reserved1,reserved2, etc */
+  },
+  {
+    "msg",
+    2,
+    PROTOBUF_C_LABEL_NONE,
+    PROTOBUF_C_TYPE_STRING,
+    0,   /* quantifier_offset */
+    offsetof(Dbservice__DelKvResp, msg),
+    NULL,
+    &protobuf_c_empty_string,
     0,             /* flags */
     0,NULL,NULL    /* reserved1,reserved2, etc */
   },
@@ -1213,15 +1251,15 @@ static const ProtobufCFieldDescriptor dbservice__del_kv_resp__field_descriptors[
 };
 static const unsigned dbservice__del_kv_resp__field_indices_by_name[] = {
   0,   /* field[0] = code */
-  2,   /* field[2] = key */
-  1,   /* field[1] = schema_name */
-  3,   /* field[3] = value */
+  3,   /* field[3] = key */
+  1,   /* field[1] = msg */
+  2,   /* field[2] = schema_name */
+  4,   /* field[4] = value */
 };
-static const ProtobufCIntRange dbservice__del_kv_resp__number_ranges[2 + 1] =
+static const ProtobufCIntRange dbservice__del_kv_resp__number_ranges[1 + 1] =
 {
   { 1, 0 },
-  { 3, 1 },
-  { 0, 4 }
+  { 0, 5 }
 };
 const ProtobufCMessageDescriptor dbservice__del_kv_resp__descriptor =
 {
@@ -1231,10 +1269,10 @@ const ProtobufCMessageDescriptor dbservice__del_kv_resp__descriptor =
   "Dbservice__DelKvResp",
   "dbservice",
   sizeof(Dbservice__DelKvResp),
-  4,
+  5,
   dbservice__del_kv_resp__field_descriptors,
   dbservice__del_kv_resp__field_indices_by_name,
-  2,  dbservice__del_kv_resp__number_ranges,
+  1,  dbservice__del_kv_resp__number_ranges,
   (ProtobufCMessageInit) dbservice__del_kv_resp__init,
   NULL,NULL,NULL    /* reserved[123] */
 };

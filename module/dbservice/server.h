@@ -7,7 +7,6 @@
 
 #ifndef _SERVER_H
 #define _SERVER_H
-#include "../drpc/drpc_util.h"
 #include "../drpc/drpc.pb-c.h"
 #include "dbservice.pb-c.h"
 #include "log.h"

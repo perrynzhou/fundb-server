@@ -8,7 +8,7 @@
 // versions:
 // 	protoc-gen-go v1.27.1
 // 	protoc        v3.6.1
-// source: dbserver.proto
+// source: dbservice.proto
 
 package pb
 
@@ -37,7 +37,7 @@ type CreateSchemaReq struct {
 func (x *CreateSchemaReq) Reset() {
 	*x = CreateSchemaReq{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_dbserver_proto_msgTypes[0]
+		mi := &file_dbservice_proto_msgTypes[0]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -50,7 +50,7 @@ func (x *CreateSchemaReq) String() string {
 func (*CreateSchemaReq) ProtoMessage() {}
 
 func (x *CreateSchemaReq) ProtoReflect() protoreflect.Message {
-	mi := &file_dbserver_proto_msgTypes[0]
+	mi := &file_dbservice_proto_msgTypes[0]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -63,7 +63,7 @@ func (x *CreateSchemaReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateSchemaReq.ProtoReflect.Descriptor instead.
 func (*CreateSchemaReq) Descriptor() ([]byte, []int) {
-	return file_dbserver_proto_rawDescGZIP(), []int{0}
+	return file_dbservice_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *CreateSchemaReq) GetName() string {
@@ -86,7 +86,7 @@ type CreateSchemaResp struct {
 func (x *CreateSchemaResp) Reset() {
 	*x = CreateSchemaResp{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_dbserver_proto_msgTypes[1]
+		mi := &file_dbservice_proto_msgTypes[1]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -99,7 +99,7 @@ func (x *CreateSchemaResp) String() string {
 func (*CreateSchemaResp) ProtoMessage() {}
 
 func (x *CreateSchemaResp) ProtoReflect() protoreflect.Message {
-	mi := &file_dbserver_proto_msgTypes[1]
+	mi := &file_dbservice_proto_msgTypes[1]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -112,7 +112,7 @@ func (x *CreateSchemaResp) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateSchemaResp.ProtoReflect.Descriptor instead.
 func (*CreateSchemaResp) Descriptor() ([]byte, []int) {
-	return file_dbserver_proto_rawDescGZIP(), []int{1}
+	return file_dbservice_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *CreateSchemaResp) GetName() string {
@@ -147,7 +147,7 @@ type QuerySchemaReq struct {
 func (x *QuerySchemaReq) Reset() {
 	*x = QuerySchemaReq{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_dbserver_proto_msgTypes[2]
+		mi := &file_dbservice_proto_msgTypes[2]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -160,7 +160,7 @@ func (x *QuerySchemaReq) String() string {
 func (*QuerySchemaReq) ProtoMessage() {}
 
 func (x *QuerySchemaReq) ProtoReflect() protoreflect.Message {
-	mi := &file_dbserver_proto_msgTypes[2]
+	mi := &file_dbservice_proto_msgTypes[2]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -173,7 +173,7 @@ func (x *QuerySchemaReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use QuerySchemaReq.ProtoReflect.Descriptor instead.
 func (*QuerySchemaReq) Descriptor() ([]byte, []int) {
-	return file_dbserver_proto_rawDescGZIP(), []int{2}
+	return file_dbservice_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *QuerySchemaReq) GetName() string {
@@ -188,14 +188,16 @@ type QuerySchemaResp struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Name string   `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	Meta []string `protobuf:"bytes,2,rep,name=meta,proto3" json:"meta,omitempty"`
+	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	Code int32  `protobuf:"varint,2,opt,name=code,proto3" json:"code,omitempty"`
+	Msg  string `protobuf:"bytes,3,opt,name=msg,proto3" json:"msg,omitempty"`
+	Meta string `protobuf:"bytes,4,opt,name=meta,proto3" json:"meta,omitempty"`
 }
 
 func (x *QuerySchemaResp) Reset() {
 	*x = QuerySchemaResp{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_dbserver_proto_msgTypes[3]
+		mi := &file_dbservice_proto_msgTypes[3]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -208,7 +210,7 @@ func (x *QuerySchemaResp) String() string {
 func (*QuerySchemaResp) ProtoMessage() {}
 
 func (x *QuerySchemaResp) ProtoReflect() protoreflect.Message {
-	mi := &file_dbserver_proto_msgTypes[3]
+	mi := &file_dbservice_proto_msgTypes[3]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -221,7 +223,7 @@ func (x *QuerySchemaResp) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use QuerySchemaResp.ProtoReflect.Descriptor instead.
 func (*QuerySchemaResp) Descriptor() ([]byte, []int) {
-	return file_dbserver_proto_rawDescGZIP(), []int{3}
+	return file_dbservice_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *QuerySchemaResp) GetName() string {
@@ -231,11 +233,25 @@ func (x *QuerySchemaResp) GetName() string {
 	return ""
 }
 
-func (x *QuerySchemaResp) GetMeta() []string {
+func (x *QuerySchemaResp) GetCode() int32 {
+	if x != nil {
+		return x.Code
+	}
+	return 0
+}
+
+func (x *QuerySchemaResp) GetMsg() string {
+	if x != nil {
+		return x.Msg
+	}
+	return ""
+}
+
+func (x *QuerySchemaResp) GetMeta() string {
 	if x != nil {
 		return x.Meta
 	}
-	return nil
+	return ""
 }
 
 type DropSchemaReq struct {
@@ -249,7 +265,7 @@ type DropSchemaReq struct {
 func (x *DropSchemaReq) Reset() {
 	*x = DropSchemaReq{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_dbserver_proto_msgTypes[4]
+		mi := &file_dbservice_proto_msgTypes[4]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -262,7 +278,7 @@ func (x *DropSchemaReq) String() string {
 func (*DropSchemaReq) ProtoMessage() {}
 
 func (x *DropSchemaReq) ProtoReflect() protoreflect.Message {
-	mi := &file_dbserver_proto_msgTypes[4]
+	mi := &file_dbservice_proto_msgTypes[4]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -275,7 +291,7 @@ func (x *DropSchemaReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DropSchemaReq.ProtoReflect.Descriptor instead.
 func (*DropSchemaReq) Descriptor() ([]byte, []int) {
-	return file_dbserver_proto_rawDescGZIP(), []int{4}
+	return file_dbservice_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *DropSchemaReq) GetName() string {
@@ -298,7 +314,7 @@ type DropSchemaResp struct {
 func (x *DropSchemaResp) Reset() {
 	*x = DropSchemaResp{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_dbserver_proto_msgTypes[5]
+		mi := &file_dbservice_proto_msgTypes[5]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -311,7 +327,7 @@ func (x *DropSchemaResp) String() string {
 func (*DropSchemaResp) ProtoMessage() {}
 
 func (x *DropSchemaResp) ProtoReflect() protoreflect.Message {
-	mi := &file_dbserver_proto_msgTypes[5]
+	mi := &file_dbservice_proto_msgTypes[5]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -324,7 +340,7 @@ func (x *DropSchemaResp) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DropSchemaResp.ProtoReflect.Descriptor instead.
 func (*DropSchemaResp) Descriptor() ([]byte, []int) {
-	return file_dbserver_proto_rawDescGZIP(), []int{5}
+	return file_dbservice_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *DropSchemaResp) GetName() string {
@@ -361,7 +377,7 @@ type PutKvReq struct {
 func (x *PutKvReq) Reset() {
 	*x = PutKvReq{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_dbserver_proto_msgTypes[6]
+		mi := &file_dbservice_proto_msgTypes[6]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -374,7 +390,7 @@ func (x *PutKvReq) String() string {
 func (*PutKvReq) ProtoMessage() {}
 
 func (x *PutKvReq) ProtoReflect() protoreflect.Message {
-	mi := &file_dbserver_proto_msgTypes[6]
+	mi := &file_dbservice_proto_msgTypes[6]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -387,7 +403,7 @@ func (x *PutKvReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PutKvReq.ProtoReflect.Descriptor instead.
 func (*PutKvReq) Descriptor() ([]byte, []int) {
-	return file_dbserver_proto_rawDescGZIP(), []int{6}
+	return file_dbservice_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *PutKvReq) GetSchemaName() string {
@@ -417,13 +433,14 @@ type PutKvResp struct {
 	unknownFields protoimpl.UnknownFields
 
 	SchemaName string `protobuf:"bytes,1,opt,name=schema_name,json=schemaName,proto3" json:"schema_name,omitempty"`
-	Msg        string `protobuf:"bytes,2,opt,name=msg,proto3" json:"msg,omitempty"`
+	Code       int32  `protobuf:"varint,2,opt,name=code,proto3" json:"code,omitempty"`
+	Msg        string `protobuf:"bytes,3,opt,name=msg,proto3" json:"msg,omitempty"`
 }
 
 func (x *PutKvResp) Reset() {
 	*x = PutKvResp{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_dbserver_proto_msgTypes[7]
+		mi := &file_dbservice_proto_msgTypes[7]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -436,7 +453,7 @@ func (x *PutKvResp) String() string {
 func (*PutKvResp) ProtoMessage() {}
 
 func (x *PutKvResp) ProtoReflect() protoreflect.Message {
-	mi := &file_dbserver_proto_msgTypes[7]
+	mi := &file_dbservice_proto_msgTypes[7]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -449,7 +466,7 @@ func (x *PutKvResp) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PutKvResp.ProtoReflect.Descriptor instead.
 func (*PutKvResp) Descriptor() ([]byte, []int) {
-	return file_dbserver_proto_rawDescGZIP(), []int{7}
+	return file_dbservice_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *PutKvResp) GetSchemaName() string {
@@ -457,6 +474,13 @@ func (x *PutKvResp) GetSchemaName() string {
 		return x.SchemaName
 	}
 	return ""
+}
+
+func (x *PutKvResp) GetCode() int32 {
+	if x != nil {
+		return x.Code
+	}
+	return 0
 }
 
 func (x *PutKvResp) GetMsg() string {
@@ -478,7 +502,7 @@ type GetKvReq struct {
 func (x *GetKvReq) Reset() {
 	*x = GetKvReq{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_dbserver_proto_msgTypes[8]
+		mi := &file_dbservice_proto_msgTypes[8]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -491,7 +515,7 @@ func (x *GetKvReq) String() string {
 func (*GetKvReq) ProtoMessage() {}
 
 func (x *GetKvReq) ProtoReflect() protoreflect.Message {
-	mi := &file_dbserver_proto_msgTypes[8]
+	mi := &file_dbservice_proto_msgTypes[8]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -504,7 +528,7 @@ func (x *GetKvReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetKvReq.ProtoReflect.Descriptor instead.
 func (*GetKvReq) Descriptor() ([]byte, []int) {
-	return file_dbserver_proto_rawDescGZIP(), []int{8}
+	return file_dbservice_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *GetKvReq) GetSchemaName() string {
@@ -529,12 +553,14 @@ type GetKvResp struct {
 	SchemaName string `protobuf:"bytes,1,opt,name=schema_name,json=schemaName,proto3" json:"schema_name,omitempty"`
 	Key        string `protobuf:"bytes,2,opt,name=key,proto3" json:"key,omitempty"`
 	Value      string `protobuf:"bytes,3,opt,name=value,proto3" json:"value,omitempty"`
+	Code       int32  `protobuf:"varint,4,opt,name=code,proto3" json:"code,omitempty"`
+	Msg        string `protobuf:"bytes,5,opt,name=msg,proto3" json:"msg,omitempty"`
 }
 
 func (x *GetKvResp) Reset() {
 	*x = GetKvResp{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_dbserver_proto_msgTypes[9]
+		mi := &file_dbservice_proto_msgTypes[9]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -547,7 +573,7 @@ func (x *GetKvResp) String() string {
 func (*GetKvResp) ProtoMessage() {}
 
 func (x *GetKvResp) ProtoReflect() protoreflect.Message {
-	mi := &file_dbserver_proto_msgTypes[9]
+	mi := &file_dbservice_proto_msgTypes[9]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -560,7 +586,7 @@ func (x *GetKvResp) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetKvResp.ProtoReflect.Descriptor instead.
 func (*GetKvResp) Descriptor() ([]byte, []int) {
-	return file_dbserver_proto_rawDescGZIP(), []int{9}
+	return file_dbservice_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *GetKvResp) GetSchemaName() string {
@@ -584,6 +610,20 @@ func (x *GetKvResp) GetValue() string {
 	return ""
 }
 
+func (x *GetKvResp) GetCode() int32 {
+	if x != nil {
+		return x.Code
+	}
+	return 0
+}
+
+func (x *GetKvResp) GetMsg() string {
+	if x != nil {
+		return x.Msg
+	}
+	return ""
+}
+
 type DelKvReq struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -596,7 +636,7 @@ type DelKvReq struct {
 func (x *DelKvReq) Reset() {
 	*x = DelKvReq{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_dbserver_proto_msgTypes[10]
+		mi := &file_dbservice_proto_msgTypes[10]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -609,7 +649,7 @@ func (x *DelKvReq) String() string {
 func (*DelKvReq) ProtoMessage() {}
 
 func (x *DelKvReq) ProtoReflect() protoreflect.Message {
-	mi := &file_dbserver_proto_msgTypes[10]
+	mi := &file_dbservice_proto_msgTypes[10]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -622,7 +662,7 @@ func (x *DelKvReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DelKvReq.ProtoReflect.Descriptor instead.
 func (*DelKvReq) Descriptor() ([]byte, []int) {
-	return file_dbserver_proto_rawDescGZIP(), []int{10}
+	return file_dbservice_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *DelKvReq) GetSchemaName() string {
@@ -644,15 +684,17 @@ type DelKvResp struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	SchemaName string `protobuf:"bytes,1,opt,name=schema_name,json=schemaName,proto3" json:"schema_name,omitempty"`
-	Key        string `protobuf:"bytes,2,opt,name=key,proto3" json:"key,omitempty"`
-	Value      string `protobuf:"bytes,3,opt,name=value,proto3" json:"value,omitempty"`
+	Code       int32  `protobuf:"varint,1,opt,name=code,proto3" json:"code,omitempty"`
+	Msg        string `protobuf:"bytes,2,opt,name=msg,proto3" json:"msg,omitempty"`
+	SchemaName string `protobuf:"bytes,3,opt,name=schema_name,json=schemaName,proto3" json:"schema_name,omitempty"`
+	Key        string `protobuf:"bytes,4,opt,name=key,proto3" json:"key,omitempty"`
+	Value      string `protobuf:"bytes,5,opt,name=value,proto3" json:"value,omitempty"`
 }
 
 func (x *DelKvResp) Reset() {
 	*x = DelKvResp{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_dbserver_proto_msgTypes[11]
+		mi := &file_dbservice_proto_msgTypes[11]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -665,7 +707,7 @@ func (x *DelKvResp) String() string {
 func (*DelKvResp) ProtoMessage() {}
 
 func (x *DelKvResp) ProtoReflect() protoreflect.Message {
-	mi := &file_dbserver_proto_msgTypes[11]
+	mi := &file_dbservice_proto_msgTypes[11]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -678,7 +720,21 @@ func (x *DelKvResp) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DelKvResp.ProtoReflect.Descriptor instead.
 func (*DelKvResp) Descriptor() ([]byte, []int) {
-	return file_dbserver_proto_rawDescGZIP(), []int{11}
+	return file_dbservice_proto_rawDescGZIP(), []int{11}
+}
+
+func (x *DelKvResp) GetCode() int32 {
+	if x != nil {
+		return x.Code
+	}
+	return 0
+}
+
+func (x *DelKvResp) GetMsg() string {
+	if x != nil {
+		return x.Msg
+	}
+	return ""
 }
 
 func (x *DelKvResp) GetSchemaName() string {
@@ -702,91 +758,99 @@ func (x *DelKvResp) GetValue() string {
 	return ""
 }
 
-var File_dbserver_proto protoreflect.FileDescriptor
+var File_dbservice_proto protoreflect.FileDescriptor
 
-var file_dbserver_proto_rawDesc = []byte{
-	0x0a, 0x0e, 0x64, 0x62, 0x73, 0x65, 0x72, 0x76, 0x65, 0x72, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f,
-	0x12, 0x08, 0x64, 0x62, 0x73, 0x65, 0x72, 0x76, 0x65, 0x72, 0x22, 0x25, 0x0a, 0x0f, 0x43, 0x72,
-	0x65, 0x61, 0x74, 0x65, 0x53, 0x63, 0x68, 0x65, 0x6d, 0x61, 0x52, 0x65, 0x71, 0x12, 0x12, 0x0a,
-	0x04, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x6e, 0x61, 0x6d,
-	0x65, 0x22, 0x4c, 0x0a, 0x10, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x53, 0x63, 0x68, 0x65, 0x6d,
-	0x61, 0x52, 0x65, 0x73, 0x70, 0x12, 0x12, 0x0a, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x01, 0x20,
-	0x01, 0x28, 0x09, 0x52, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x12, 0x12, 0x0a, 0x04, 0x63, 0x6f, 0x64,
-	0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x05, 0x52, 0x04, 0x63, 0x6f, 0x64, 0x65, 0x12, 0x10, 0x0a,
-	0x03, 0x6d, 0x73, 0x67, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x03, 0x6d, 0x73, 0x67, 0x22,
-	0x24, 0x0a, 0x0e, 0x51, 0x75, 0x65, 0x72, 0x79, 0x53, 0x63, 0x68, 0x65, 0x6d, 0x61, 0x52, 0x65,
-	0x71, 0x12, 0x12, 0x0a, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52,
-	0x04, 0x6e, 0x61, 0x6d, 0x65, 0x22, 0x39, 0x0a, 0x0f, 0x51, 0x75, 0x65, 0x72, 0x79, 0x53, 0x63,
-	0x68, 0x65, 0x6d, 0x61, 0x52, 0x65, 0x73, 0x70, 0x12, 0x12, 0x0a, 0x04, 0x6e, 0x61, 0x6d, 0x65,
-	0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x12, 0x12, 0x0a, 0x04,
-	0x6d, 0x65, 0x74, 0x61, 0x18, 0x02, 0x20, 0x03, 0x28, 0x09, 0x52, 0x04, 0x6d, 0x65, 0x74, 0x61,
-	0x22, 0x23, 0x0a, 0x0d, 0x44, 0x72, 0x6f, 0x70, 0x53, 0x63, 0x68, 0x65, 0x6d, 0x61, 0x52, 0x65,
-	0x71, 0x12, 0x12, 0x0a, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52,
-	0x04, 0x6e, 0x61, 0x6d, 0x65, 0x22, 0x4a, 0x0a, 0x0e, 0x44, 0x72, 0x6f, 0x70, 0x53, 0x63, 0x68,
+var file_dbservice_proto_rawDesc = []byte{
+	0x0a, 0x0f, 0x64, 0x62, 0x73, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74,
+	0x6f, 0x12, 0x09, 0x64, 0x62, 0x73, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x22, 0x25, 0x0a, 0x0f,
+	0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x53, 0x63, 0x68, 0x65, 0x6d, 0x61, 0x52, 0x65, 0x71, 0x12,
+	0x12, 0x0a, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x6e,
+	0x61, 0x6d, 0x65, 0x22, 0x4c, 0x0a, 0x10, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x53, 0x63, 0x68,
 	0x65, 0x6d, 0x61, 0x52, 0x65, 0x73, 0x70, 0x12, 0x12, 0x0a, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x18,
 	0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x12, 0x12, 0x0a, 0x04, 0x63,
 	0x6f, 0x64, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x05, 0x52, 0x04, 0x63, 0x6f, 0x64, 0x65, 0x12,
 	0x10, 0x0a, 0x03, 0x6d, 0x73, 0x67, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x03, 0x6d, 0x73,
-	0x67, 0x22, 0x53, 0x0a, 0x08, 0x50, 0x75, 0x74, 0x4b, 0x76, 0x52, 0x65, 0x71, 0x12, 0x1f, 0x0a,
-	0x0b, 0x73, 0x63, 0x68, 0x65, 0x6d, 0x61, 0x5f, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x01, 0x20, 0x01,
-	0x28, 0x09, 0x52, 0x0a, 0x73, 0x63, 0x68, 0x65, 0x6d, 0x61, 0x4e, 0x61, 0x6d, 0x65, 0x12, 0x10,
-	0x0a, 0x03, 0x6b, 0x65, 0x79, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x03, 0x6b, 0x65, 0x79,
-	0x12, 0x14, 0x0a, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52,
-	0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x22, 0x3e, 0x0a, 0x09, 0x50, 0x75, 0x74, 0x4b, 0x76, 0x52,
-	0x65, 0x73, 0x70, 0x12, 0x1f, 0x0a, 0x0b, 0x73, 0x63, 0x68, 0x65, 0x6d, 0x61, 0x5f, 0x6e, 0x61,
-	0x6d, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0a, 0x73, 0x63, 0x68, 0x65, 0x6d, 0x61,
-	0x4e, 0x61, 0x6d, 0x65, 0x12, 0x10, 0x0a, 0x03, 0x6d, 0x73, 0x67, 0x18, 0x02, 0x20, 0x01, 0x28,
-	0x09, 0x52, 0x03, 0x6d, 0x73, 0x67, 0x22, 0x3d, 0x0a, 0x08, 0x47, 0x65, 0x74, 0x4b, 0x76, 0x52,
-	0x65, 0x71, 0x12, 0x1f, 0x0a, 0x0b, 0x73, 0x63, 0x68, 0x65, 0x6d, 0x61, 0x5f, 0x6e, 0x61, 0x6d,
-	0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0a, 0x73, 0x63, 0x68, 0x65, 0x6d, 0x61, 0x4e,
-	0x61, 0x6d, 0x65, 0x12, 0x10, 0x0a, 0x03, 0x6b, 0x65, 0x79, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09,
-	0x52, 0x03, 0x6b, 0x65, 0x79, 0x22, 0x54, 0x0a, 0x09, 0x47, 0x65, 0x74, 0x4b, 0x76, 0x52, 0x65,
-	0x73, 0x70, 0x12, 0x1f, 0x0a, 0x0b, 0x73, 0x63, 0x68, 0x65, 0x6d, 0x61, 0x5f, 0x6e, 0x61, 0x6d,
-	0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0a, 0x73, 0x63, 0x68, 0x65, 0x6d, 0x61, 0x4e,
-	0x61, 0x6d, 0x65, 0x12, 0x10, 0x0a, 0x03, 0x6b, 0x65, 0x79, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09,
-	0x52, 0x03, 0x6b, 0x65, 0x79, 0x12, 0x14, 0x0a, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x18, 0x03,
-	0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x22, 0x3d, 0x0a, 0x08, 0x44,
-	0x65, 0x6c, 0x4b, 0x76, 0x52, 0x65, 0x71, 0x12, 0x1f, 0x0a, 0x0b, 0x73, 0x63, 0x68, 0x65, 0x6d,
-	0x61, 0x5f, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0a, 0x73, 0x63,
-	0x68, 0x65, 0x6d, 0x61, 0x4e, 0x61, 0x6d, 0x65, 0x12, 0x10, 0x0a, 0x03, 0x6b, 0x65, 0x79, 0x18,
-	0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x03, 0x6b, 0x65, 0x79, 0x22, 0x54, 0x0a, 0x09, 0x44, 0x65,
-	0x6c, 0x4b, 0x76, 0x52, 0x65, 0x73, 0x70, 0x12, 0x1f, 0x0a, 0x0b, 0x73, 0x63, 0x68, 0x65, 0x6d,
-	0x61, 0x5f, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0a, 0x73, 0x63,
-	0x68, 0x65, 0x6d, 0x61, 0x4e, 0x61, 0x6d, 0x65, 0x12, 0x10, 0x0a, 0x03, 0x6b, 0x65, 0x79, 0x18,
-	0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x03, 0x6b, 0x65, 0x79, 0x12, 0x14, 0x0a, 0x05, 0x76, 0x61,
-	0x6c, 0x75, 0x65, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65,
-	0x42, 0x07, 0x5a, 0x05, 0x2e, 0x2e, 0x2f, 0x70, 0x62, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f,
-	0x33,
+	0x67, 0x22, 0x24, 0x0a, 0x0e, 0x51, 0x75, 0x65, 0x72, 0x79, 0x53, 0x63, 0x68, 0x65, 0x6d, 0x61,
+	0x52, 0x65, 0x71, 0x12, 0x12, 0x0a, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28,
+	0x09, 0x52, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x22, 0x5f, 0x0a, 0x0f, 0x51, 0x75, 0x65, 0x72, 0x79,
+	0x53, 0x63, 0x68, 0x65, 0x6d, 0x61, 0x52, 0x65, 0x73, 0x70, 0x12, 0x12, 0x0a, 0x04, 0x6e, 0x61,
+	0x6d, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x12, 0x12,
+	0x0a, 0x04, 0x63, 0x6f, 0x64, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x05, 0x52, 0x04, 0x63, 0x6f,
+	0x64, 0x65, 0x12, 0x10, 0x0a, 0x03, 0x6d, 0x73, 0x67, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52,
+	0x03, 0x6d, 0x73, 0x67, 0x12, 0x12, 0x0a, 0x04, 0x6d, 0x65, 0x74, 0x61, 0x18, 0x04, 0x20, 0x01,
+	0x28, 0x09, 0x52, 0x04, 0x6d, 0x65, 0x74, 0x61, 0x22, 0x23, 0x0a, 0x0d, 0x44, 0x72, 0x6f, 0x70,
+	0x53, 0x63, 0x68, 0x65, 0x6d, 0x61, 0x52, 0x65, 0x71, 0x12, 0x12, 0x0a, 0x04, 0x6e, 0x61, 0x6d,
+	0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x22, 0x4a, 0x0a,
+	0x0e, 0x44, 0x72, 0x6f, 0x70, 0x53, 0x63, 0x68, 0x65, 0x6d, 0x61, 0x52, 0x65, 0x73, 0x70, 0x12,
+	0x12, 0x0a, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x6e,
+	0x61, 0x6d, 0x65, 0x12, 0x12, 0x0a, 0x04, 0x63, 0x6f, 0x64, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28,
+	0x05, 0x52, 0x04, 0x63, 0x6f, 0x64, 0x65, 0x12, 0x10, 0x0a, 0x03, 0x6d, 0x73, 0x67, 0x18, 0x03,
+	0x20, 0x01, 0x28, 0x09, 0x52, 0x03, 0x6d, 0x73, 0x67, 0x22, 0x53, 0x0a, 0x08, 0x50, 0x75, 0x74,
+	0x4b, 0x76, 0x52, 0x65, 0x71, 0x12, 0x1f, 0x0a, 0x0b, 0x73, 0x63, 0x68, 0x65, 0x6d, 0x61, 0x5f,
+	0x6e, 0x61, 0x6d, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0a, 0x73, 0x63, 0x68, 0x65,
+	0x6d, 0x61, 0x4e, 0x61, 0x6d, 0x65, 0x12, 0x10, 0x0a, 0x03, 0x6b, 0x65, 0x79, 0x18, 0x02, 0x20,
+	0x01, 0x28, 0x09, 0x52, 0x03, 0x6b, 0x65, 0x79, 0x12, 0x14, 0x0a, 0x05, 0x76, 0x61, 0x6c, 0x75,
+	0x65, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x22, 0x52,
+	0x0a, 0x09, 0x50, 0x75, 0x74, 0x4b, 0x76, 0x52, 0x65, 0x73, 0x70, 0x12, 0x1f, 0x0a, 0x0b, 0x73,
+	0x63, 0x68, 0x65, 0x6d, 0x61, 0x5f, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09,
+	0x52, 0x0a, 0x73, 0x63, 0x68, 0x65, 0x6d, 0x61, 0x4e, 0x61, 0x6d, 0x65, 0x12, 0x12, 0x0a, 0x04,
+	0x63, 0x6f, 0x64, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x05, 0x52, 0x04, 0x63, 0x6f, 0x64, 0x65,
+	0x12, 0x10, 0x0a, 0x03, 0x6d, 0x73, 0x67, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x03, 0x6d,
+	0x73, 0x67, 0x22, 0x3d, 0x0a, 0x08, 0x47, 0x65, 0x74, 0x4b, 0x76, 0x52, 0x65, 0x71, 0x12, 0x1f,
+	0x0a, 0x0b, 0x73, 0x63, 0x68, 0x65, 0x6d, 0x61, 0x5f, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x01, 0x20,
+	0x01, 0x28, 0x09, 0x52, 0x0a, 0x73, 0x63, 0x68, 0x65, 0x6d, 0x61, 0x4e, 0x61, 0x6d, 0x65, 0x12,
+	0x10, 0x0a, 0x03, 0x6b, 0x65, 0x79, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x03, 0x6b, 0x65,
+	0x79, 0x22, 0x7a, 0x0a, 0x09, 0x47, 0x65, 0x74, 0x4b, 0x76, 0x52, 0x65, 0x73, 0x70, 0x12, 0x1f,
+	0x0a, 0x0b, 0x73, 0x63, 0x68, 0x65, 0x6d, 0x61, 0x5f, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x01, 0x20,
+	0x01, 0x28, 0x09, 0x52, 0x0a, 0x73, 0x63, 0x68, 0x65, 0x6d, 0x61, 0x4e, 0x61, 0x6d, 0x65, 0x12,
+	0x10, 0x0a, 0x03, 0x6b, 0x65, 0x79, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x03, 0x6b, 0x65,
+	0x79, 0x12, 0x14, 0x0a, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09,
+	0x52, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x12, 0x12, 0x0a, 0x04, 0x63, 0x6f, 0x64, 0x65, 0x18,
+	0x04, 0x20, 0x01, 0x28, 0x05, 0x52, 0x04, 0x63, 0x6f, 0x64, 0x65, 0x12, 0x10, 0x0a, 0x03, 0x6d,
+	0x73, 0x67, 0x18, 0x05, 0x20, 0x01, 0x28, 0x09, 0x52, 0x03, 0x6d, 0x73, 0x67, 0x22, 0x3d, 0x0a,
+	0x08, 0x44, 0x65, 0x6c, 0x4b, 0x76, 0x52, 0x65, 0x71, 0x12, 0x1f, 0x0a, 0x0b, 0x73, 0x63, 0x68,
+	0x65, 0x6d, 0x61, 0x5f, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0a,
+	0x73, 0x63, 0x68, 0x65, 0x6d, 0x61, 0x4e, 0x61, 0x6d, 0x65, 0x12, 0x10, 0x0a, 0x03, 0x6b, 0x65,
+	0x79, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x03, 0x6b, 0x65, 0x79, 0x22, 0x7a, 0x0a, 0x09,
+	0x44, 0x65, 0x6c, 0x4b, 0x76, 0x52, 0x65, 0x73, 0x70, 0x12, 0x12, 0x0a, 0x04, 0x63, 0x6f, 0x64,
+	0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x05, 0x52, 0x04, 0x63, 0x6f, 0x64, 0x65, 0x12, 0x10, 0x0a,
+	0x03, 0x6d, 0x73, 0x67, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x03, 0x6d, 0x73, 0x67, 0x12,
+	0x1f, 0x0a, 0x0b, 0x73, 0x63, 0x68, 0x65, 0x6d, 0x61, 0x5f, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x03,
+	0x20, 0x01, 0x28, 0x09, 0x52, 0x0a, 0x73, 0x63, 0x68, 0x65, 0x6d, 0x61, 0x4e, 0x61, 0x6d, 0x65,
+	0x12, 0x10, 0x0a, 0x03, 0x6b, 0x65, 0x79, 0x18, 0x04, 0x20, 0x01, 0x28, 0x09, 0x52, 0x03, 0x6b,
+	0x65, 0x79, 0x12, 0x14, 0x0a, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x18, 0x05, 0x20, 0x01, 0x28,
+	0x09, 0x52, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x42, 0x07, 0x5a, 0x05, 0x2e, 0x2e, 0x2f, 0x70,
+	0x62, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
-	file_dbserver_proto_rawDescOnce sync.Once
-	file_dbserver_proto_rawDescData = file_dbserver_proto_rawDesc
+	file_dbservice_proto_rawDescOnce sync.Once
+	file_dbservice_proto_rawDescData = file_dbservice_proto_rawDesc
 )
 
-func file_dbserver_proto_rawDescGZIP() []byte {
-	file_dbserver_proto_rawDescOnce.Do(func() {
-		file_dbserver_proto_rawDescData = protoimpl.X.CompressGZIP(file_dbserver_proto_rawDescData)
+func file_dbservice_proto_rawDescGZIP() []byte {
+	file_dbservice_proto_rawDescOnce.Do(func() {
+		file_dbservice_proto_rawDescData = protoimpl.X.CompressGZIP(file_dbservice_proto_rawDescData)
 	})
-	return file_dbserver_proto_rawDescData
+	return file_dbservice_proto_rawDescData
 }
 
-var file_dbserver_proto_msgTypes = make([]protoimpl.MessageInfo, 12)
-var file_dbserver_proto_goTypes = []interface{}{
-	(*CreateSchemaReq)(nil),  // 0: dbserver.CreateSchemaReq
-	(*CreateSchemaResp)(nil), // 1: dbserver.CreateSchemaResp
-	(*QuerySchemaReq)(nil),   // 2: dbserver.QuerySchemaReq
-	(*QuerySchemaResp)(nil),  // 3: dbserver.QuerySchemaResp
-	(*DropSchemaReq)(nil),    // 4: dbserver.DropSchemaReq
-	(*DropSchemaResp)(nil),   // 5: dbserver.DropSchemaResp
-	(*PutKvReq)(nil),         // 6: dbserver.PutKvReq
-	(*PutKvResp)(nil),        // 7: dbserver.PutKvResp
-	(*GetKvReq)(nil),         // 8: dbserver.GetKvReq
-	(*GetKvResp)(nil),        // 9: dbserver.GetKvResp
-	(*DelKvReq)(nil),         // 10: dbserver.DelKvReq
-	(*DelKvResp)(nil),        // 11: dbserver.DelKvResp
+var file_dbservice_proto_msgTypes = make([]protoimpl.MessageInfo, 12)
+var file_dbservice_proto_goTypes = []interface{}{
+	(*CreateSchemaReq)(nil),  // 0: dbservice.CreateSchemaReq
+	(*CreateSchemaResp)(nil), // 1: dbservice.CreateSchemaResp
+	(*QuerySchemaReq)(nil),   // 2: dbservice.QuerySchemaReq
+	(*QuerySchemaResp)(nil),  // 3: dbservice.QuerySchemaResp
+	(*DropSchemaReq)(nil),    // 4: dbservice.DropSchemaReq
+	(*DropSchemaResp)(nil),   // 5: dbservice.DropSchemaResp
+	(*PutKvReq)(nil),         // 6: dbservice.PutKvReq
+	(*PutKvResp)(nil),        // 7: dbservice.PutKvResp
+	(*GetKvReq)(nil),         // 8: dbservice.GetKvReq
+	(*GetKvResp)(nil),        // 9: dbservice.GetKvResp
+	(*DelKvReq)(nil),         // 10: dbservice.DelKvReq
+	(*DelKvResp)(nil),        // 11: dbservice.DelKvResp
 }
-var file_dbserver_proto_depIdxs = []int32{
+var file_dbservice_proto_depIdxs = []int32{
 	0, // [0:0] is the sub-list for method output_type
 	0, // [0:0] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
@@ -794,13 +858,13 @@ var file_dbserver_proto_depIdxs = []int32{
 	0, // [0:0] is the sub-list for field type_name
 }
 
-func init() { file_dbserver_proto_init() }
-func file_dbserver_proto_init() {
-	if File_dbserver_proto != nil {
+func init() { file_dbservice_proto_init() }
+func file_dbservice_proto_init() {
+	if File_dbservice_proto != nil {
 		return
 	}
 	if !protoimpl.UnsafeEnabled {
-		file_dbserver_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
+		file_dbservice_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*CreateSchemaReq); i {
 			case 0:
 				return &v.state
@@ -812,7 +876,7 @@ func file_dbserver_proto_init() {
 				return nil
 			}
 		}
-		file_dbserver_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
+		file_dbservice_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*CreateSchemaResp); i {
 			case 0:
 				return &v.state
@@ -824,7 +888,7 @@ func file_dbserver_proto_init() {
 				return nil
 			}
 		}
-		file_dbserver_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
+		file_dbservice_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*QuerySchemaReq); i {
 			case 0:
 				return &v.state
@@ -836,7 +900,7 @@ func file_dbserver_proto_init() {
 				return nil
 			}
 		}
-		file_dbserver_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
+		file_dbservice_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*QuerySchemaResp); i {
 			case 0:
 				return &v.state
@@ -848,7 +912,7 @@ func file_dbserver_proto_init() {
 				return nil
 			}
 		}
-		file_dbserver_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
+		file_dbservice_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*DropSchemaReq); i {
 			case 0:
 				return &v.state
@@ -860,7 +924,7 @@ func file_dbserver_proto_init() {
 				return nil
 			}
 		}
-		file_dbserver_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
+		file_dbservice_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*DropSchemaResp); i {
 			case 0:
 				return &v.state
@@ -872,7 +936,7 @@ func file_dbserver_proto_init() {
 				return nil
 			}
 		}
-		file_dbserver_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
+		file_dbservice_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*PutKvReq); i {
 			case 0:
 				return &v.state
@@ -884,7 +948,7 @@ func file_dbserver_proto_init() {
 				return nil
 			}
 		}
-		file_dbserver_proto_msgTypes[7].Exporter = func(v interface{}, i int) interface{} {
+		file_dbservice_proto_msgTypes[7].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*PutKvResp); i {
 			case 0:
 				return &v.state
@@ -896,7 +960,7 @@ func file_dbserver_proto_init() {
 				return nil
 			}
 		}
-		file_dbserver_proto_msgTypes[8].Exporter = func(v interface{}, i int) interface{} {
+		file_dbservice_proto_msgTypes[8].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*GetKvReq); i {
 			case 0:
 				return &v.state
@@ -908,7 +972,7 @@ func file_dbserver_proto_init() {
 				return nil
 			}
 		}
-		file_dbserver_proto_msgTypes[9].Exporter = func(v interface{}, i int) interface{} {
+		file_dbservice_proto_msgTypes[9].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*GetKvResp); i {
 			case 0:
 				return &v.state
@@ -920,7 +984,7 @@ func file_dbserver_proto_init() {
 				return nil
 			}
 		}
-		file_dbserver_proto_msgTypes[10].Exporter = func(v interface{}, i int) interface{} {
+		file_dbservice_proto_msgTypes[10].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*DelKvReq); i {
 			case 0:
 				return &v.state
@@ -932,7 +996,7 @@ func file_dbserver_proto_init() {
 				return nil
 			}
 		}
-		file_dbserver_proto_msgTypes[11].Exporter = func(v interface{}, i int) interface{} {
+		file_dbservice_proto_msgTypes[11].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*DelKvResp); i {
 			case 0:
 				return &v.state
@@ -949,18 +1013,18 @@ func file_dbserver_proto_init() {
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: file_dbserver_proto_rawDesc,
+			RawDescriptor: file_dbservice_proto_rawDesc,
 			NumEnums:      0,
 			NumMessages:   12,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
-		GoTypes:           file_dbserver_proto_goTypes,
-		DependencyIndexes: file_dbserver_proto_depIdxs,
-		MessageInfos:      file_dbserver_proto_msgTypes,
+		GoTypes:           file_dbservice_proto_goTypes,
+		DependencyIndexes: file_dbservice_proto_depIdxs,
+		MessageInfos:      file_dbservice_proto_msgTypes,
 	}.Build()
-	File_dbserver_proto = out.File
-	file_dbserver_proto_rawDesc = nil
-	file_dbserver_proto_goTypes = nil
-	file_dbserver_proto_depIdxs = nil
+	File_dbservice_proto = out.File
+	file_dbservice_proto_rawDesc = nil
+	file_dbservice_proto_goTypes = nil
+	file_dbservice_proto_depIdxs = nil
 }
