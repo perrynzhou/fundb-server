@@ -19,7 +19,7 @@
 #include <errno.h>
 #include <ev.h>
 
-static int setnonblocking(int sockfd)
+static int set_non_blocking(int sockfd)
 {
   if (fcntl(sockfd, F_SETFD, fcntl(sockfd, F_GETFD, 0) | O_NONBLOCK) ==
       -1)
@@ -138,7 +138,7 @@ void server_start(server_t *srv)
 {
   int max_event = 655350;
   int listenfd = srv->listener->fd;
-   setnonblocking(listenfd);
+   set_non_blocking(listenfd);
 
   struct epoll_event *events = (struct epoll_event *)calloc(max_event,sizeof(struct epoll_event));
   int nfds;
