@@ -20,7 +20,7 @@
 void *
 daos_drpc_alloc(void *arg, size_t size)
 {
-	struct drpc_alloc *alloc =(struct drpc_alloc *) arg;
+	struct drpc_alloc *alloc = (struct drpc_alloc *)arg;
 	void *buf;
 
 	D_ALLOC(buf, size);
@@ -117,7 +117,7 @@ drpc_response_create(Drpc__Request *call)
 void drpc_response_free(Drpc__Response *resp)
 {
 	struct drpc_alloc alloc = PROTO_ALLOCATOR_INIT(alloc);
-     
+
 	drpc__response__free_unpacked(resp, &alloc.alloc);
 }
 
@@ -193,7 +193,7 @@ unixcomm_listen(char *sockaddr, int flags, int *fd_ptr)
 	if (bind(*fd_ptr, (struct sockaddr *)&address, sizeof(struct sockaddr_un)) < 0)
 	{
 		char *msg = strerror(errno);
-		fprintf(stdout,"msg=%s\n",msg);
+		fprintf(stdout, "msg=%s\n", msg);
 		int rc = errno;
 		unixcomm_close(*fd_ptr);
 		return rc;
@@ -286,7 +286,7 @@ drpc_marshal_call(Drpc__Request *msg, uint8_t **bytes)
 		return -1;
 	}
 
-	buf_len =drpc__request__get_packed_size(msg);
+	buf_len = drpc__request__get_packed_size(msg);
 
 	D_ALLOC(buf, buf_len);
 	if (!buf)
@@ -470,22 +470,35 @@ drpc_accept(struct drpc *listener_ctx)
 
 	if (!drpc_is_valid_listener(listener_ctx))
 	{
-		fprintf(stdout,".....drpc_is_valid_listener.....\n");
+		fprintf(stdout, ".....drpc_is_valid_listener.....\n");
 		return NULL;
 	}
 
 	D_ALLOC_PTR(session_ctx);
-	if (session_ctx == NULL) {
-		fprintf(stdout,".....D_ALLOC_PTR.....\n");
+	if (session_ctx == NULL)
+	{
+		fprintf(stdout, ".....D_ALLOC_PTR.....\n");
 		return NULL;
 	}
 	int fd = unixcomm_accept(listener_ctx->fd);
 	if (fd <= 0)
 	{
-		fprintf(stdout,".....unixcomm_accept.....:%s\n",strerror(errno));
+		fprintf(stdout, ".....unixcomm_accept.....:%s\n", strerror(errno));
 		return NULL;
 	}
 	init_drpc_ctx(session_ctx, fd, listener_ctx->handler);
+	return session_ctx;
+}
+struct drpc *drpc_alloc(int fd)
+{
+	struct drpc *session_ctx;
+	D_ALLOC_PTR(session_ctx);
+	if (session_ctx == NULL)
+	{
+		return NULL;
+	}
+	session_ctx->fd = fd;
+	session_ctx->handler = NULL;
 	return session_ctx;
 }
 
@@ -495,9 +508,9 @@ send_response(struct drpc *ctx, Drpc__Response *response)
 	int rc;
 	size_t buffer_len;
 	uint8_t *buffer;
-    assert(response !=NULL);
+	assert(response != NULL);
 	buffer_len = drpc__response__get_packed_size(response);
-     
+
 	D_ALLOC(buffer, buffer_len);
 	if (buffer == NULL)
 		return -1;
@@ -532,7 +545,7 @@ get_incoming_call(struct drpc *ctx, Drpc__Request **call)
 
 	*call = drpc__request__unpack(&alloc.alloc, message_len, buffer);
 	D_FREE(buffer);
-	if (alloc.oom || *call==NULL)
+	if (alloc.oom || *call == NULL)
 	{
 		return -1;
 	}
@@ -593,7 +606,7 @@ int drpc_send_response(struct drpc *session_ctx, Drpc__Response *resp)
 	{
 		return -1;
 	}
-	int ret =send_response(session_ctx, resp);
+	int ret = send_response(session_ctx, resp);
 	D_FREE(resp->body.data);
 	return ret;
 }

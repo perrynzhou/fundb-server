@@ -16,7 +16,7 @@
 #include <sys/socket.h>
 #include <errno.h>
 #include <unistd.h>
-
+#include <getopt.h>
 #include "log.h"
 #include "kv_db.h"
 #include "dbservice.h"
@@ -31,6 +31,7 @@
 #define BUF_SIZE 16
 #define MAX_LINE 256
 
+
 static void *server_thread_cb(void *arg)
 {
   server_t *srv = (server_t *)arg;
@@ -40,12 +41,23 @@ static void *server_thread_cb(void *arg)
 }
 int main(int argc, char *argv[])
 {
-
-  char *conf_file = argv[1];
+  int option = 0;
+  char *conf_file = NULL;
+  while ((option = getopt(argc, argv, "c:")) != -1)
+  {
+    switch (option)
+    {
+    case 'c':
+      conf_file = strdup(optarg);
+      break;
+    }
+  }
   if (conf_file == NULL)
   {
+    fprintf(stdout, "empty conf file\n");
     return -1;
   }
+
   conf_t *conf = conf_alloc(conf_file);
   assert(conf != NULL);
 

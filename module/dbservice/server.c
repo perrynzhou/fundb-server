@@ -18,17 +18,6 @@
 #include <sys/epoll.h>
 #include <errno.h>
 #include <ev.h>
-static void epoll_ctl_add(int epfd, int fd, uint32_t events)
-{
-  struct epoll_event ev;
-  ev.events = events;
-  ev.data.fd = fd;
-  if (epoll_ctl(epfd, EPOLL_CTL_ADD, fd, &ev) == -1)
-  {
-    perror("epoll_ctl()\n");
-    exit(1);
-  }
-}
 
 static int setnonblocking(int sockfd)
 {
@@ -64,70 +53,110 @@ server_t *server_alloc(int server_type, int id, drpc_handler_func handler, void 
   return srv;
 }
 
+inline static int server_add_event(int epollfd, struct drpc *session_ctx, int state)
+{
+  struct epoll_event ev;
+  ev.events = state;
+  ev.data.ptr = session_ctx;
+  return epoll_ctl(epollfd, EPOLL_CTL_ADD, session_ctx->fd, &ev);
+}
+
+inline static void server_modify_event(int epollfd, struct drpc *session_ctx, int state)
+{
+  struct epoll_event ev;
+  ev.events = state;
+  ev.data.ptr = session_ctx;
+  epoll_ctl(epollfd, EPOLL_CTL_MOD, session_ctx->fd, &ev);
+}
+
+inline static void server_delete_event(int epollfd, struct drpc *session_ctx, int state)
+{
+  struct epoll_event ev;
+  ev.events = state;
+ ev.data.ptr = session_ctx;
+  epoll_ctl(epollfd, EPOLL_CTL_DEL, session_ctx->fd, &ev);
+}
+
+static void server_handle_accept(int epollfd, struct drpc *listener)
+{
+  struct epoll_event event;
+  struct drpc *session_ctx = drpc_accept(listener);
+  if (session_ctx == NULL || session_ctx->fd == -1)
+  {
+    log_info("session_ctx=%p is nil,error=%s", session_ctx, strerror(errno));
+    return;
+  }
+  event.data.ptr = session_ctx;
+  event.events = EPOLLIN | EPOLLET;
+  if (server_add_event(epollfd, session_ctx, EPOLLIN) == -1)
+  {
+    server_delete_event(epollfd, session_ctx, EPOLLIN);
+    log_info("fd=%d closed", session_ctx->fd);
+  }
+}
+
+static void server_handle_events(int epollfd, struct epoll_event *events, int num, struct drpc *listener, void *ctx)
+{
+  server_t *srv = (server_t *)ctx;
+  for (int i = 0; i < num; ++i)
+  {    struct drpc *session_ctx = (struct drpc *)events[i].data.ptr;
+    if ((events[i].events & EPOLLERR) ||
+        (events[i].events & EPOLLHUP) ||
+        (!(events[i].events & EPOLLIN)))
+    {
+      drpc_close(session_ctx);
+      server_delete_event(epollfd, session_ctx, EPOLLIN);
+      continue;
+    }
+    
+    if ((session_ctx->fd == listener->fd) && (events[i].events & EPOLLIN))
+    {
+      server_handle_accept(epollfd, listener);
+    }
+    else 
+    {
+      struct drpc *session_ctx = (struct drpc *)events[i].data.ptr;
+      Drpc__Request *incoming;
+      int result = drpc_recv_call(session_ctx, &incoming);
+      Drpc__Response *resp = drpc_response_create(incoming);
+      log_info("::::engine accept client fd=%d,socket=%s", session_ctx->fd,srv->socket);
+      session_ctx->handler(incoming, resp, (kv_db_t *)srv->db_ctx);
+      drpc_send_response(session_ctx, resp);
+      drpc_response_free(resp);
+      drpc_close(session_ctx);
+    }
+    /*
+    else
+    {
+      // do_write(epollfd, fd, buf);
+    }
+    */
+  }
+}
+
 void server_start(server_t *srv)
 {
-  int epfd;
+  int max_event = 655350;
+  int listenfd = srv->listener->fd;
+   setnonblocking(listenfd);
+
+  struct epoll_event *events = (struct epoll_event *)calloc(max_event,sizeof(struct epoll_event));
   int nfds;
-  int listen_sock;
-  int max_event = 4096;
-  struct epoll_event events[max_event];
-
-  struct epoll_event event;
-  listen_sock = srv->listener->fd;
-
-  kv_db_t *db = (kv_db_t *)srv->db_ctx;
-  setnonblocking(listen_sock);
-  epfd = epoll_create(1);
-  epoll_ctl_add(epfd, listen_sock, EPOLLIN | EPOLLOUT | EPOLLET);
-
-  while (true)
+  int efd = epoll_create(max_event);
+  server_add_event(efd, srv->listener, EPOLLIN | EPOLLOUT | EPOLLET);
+  while (1)
   {
-    nfds = epoll_wait(epfd, events, max_event, -1);
-    for (int i = 0; i < nfds; i++)
-    {
-
-      if ((events[i].events & EPOLLERR) ||
-          (events[i].events & EPOLLHUP) ||
-          (!(events[i].events & EPOLLIN)))
-      {
-        close(events[i].data.fd);
-        continue;
-      }
-      else if (listen_sock == events[i].data.fd)
-      {
-        struct drpc *session_ctx = drpc_accept(srv->listener);
-        if (session_ctx == NULL || session_ctx->fd == -1)
-        {
-          log_info("session_ctx=%p is nil,error=%s", session_ctx,strerror(errno));
-          break;
-        }
-
-        event.data.ptr = session_ctx;
-        event.events = EPOLLIN | EPOLLET;
-        int s = epoll_ctl(epfd, EPOLL_CTL_ADD, session_ctx->fd, &event);
-        if (s == -1)
-        {
-          epoll_ctl(epfd, EPOLL_CTL_DEL, session_ctx->fd, NULL);
-          log_info("fd=%d closed", session_ctx->fd);
-        }
-
-        continue;
-      }
-
-      else
-      {
-        struct drpc *session_ctx = (struct drpc *)events[i].data.ptr;
-        Drpc__Request *incoming;
-        int result = drpc_recv_call(session_ctx, &incoming);
-        Drpc__Response *resp = drpc_response_create(incoming);
-        log_info("enter handler=%p,fd=%d", session_ctx->handler, session_ctx->fd);
-        session_ctx->handler(incoming, resp, db);
-        drpc_send_response(session_ctx, resp);
-        drpc_response_free(resp);
-        close(session_ctx->fd);
-      }
+    // 获取已经准备好的描述符事件
+    nfds = epoll_wait(efd, events, max_event, -1);
+    if (nfds <0) {
+      log_error("::epoll_wait error=%s",strerror(errno));
+      break;
     }
+    server_handle_events(efd, events, nfds, srv->listener, srv);
   }
+  close(efd);
+  drpc_close(srv->listener);
+  free(events);
 }
 
 void server_free(server_t *srv)

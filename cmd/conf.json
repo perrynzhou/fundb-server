@@ -1,5 +1,5 @@
 {
-  "thread_num": 8,
+  "thread_num":4,
   "db_name": "demo",
   "db_path": "/tmp",
   "server_port": 50051

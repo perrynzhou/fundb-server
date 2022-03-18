@@ -87,6 +87,7 @@ int drpc_connect(char *sockaddr, struct drpc **);
 struct drpc *drpc_listen(char *sockaddr, drpc_handler_func handler);
 bool drpc_is_valid_listener(struct drpc *ctx);
 struct drpc *drpc_accept(struct drpc *listener_ctx);
+struct drpc *drpc_alloc(int fd);
 int drpc_recv_call(struct drpc *ctx, Drpc__Request **call);
 int drpc_send_response(struct drpc *ctx, Drpc__Response *resp);
 int drpc_close(struct drpc *ctx);

@@ -51,9 +51,10 @@ var (
 )
 
 type OpMetric struct {
-	Succ  uint64
-	Fail  uint64
-	Total uint64
+	Succ          uint64
+	Fail          uint64
+	Total         uint64
+	ElapseSeconds float64
 }
 type TData struct {
 	Id   int    `json:"id"`
@@ -134,7 +135,7 @@ func putKv(c pb.DrpcServiceClient, ctx context.Context, n int32) int32 {
 		Id:   rand.Int(),
 		Port: rand.Intn(*count) + 4000,
 		Uid:  uuid.New().String(),
-		Name: fmt.Sprintf("data-%d-perrynzhou", rand.Int()),
+		Name: fmt.Sprintf("data-%d-perrynzhou-%s-%s-%s-%s-%s", rand.Int(), uuid.New().String(), uuid.New().String(), uuid.New().String(), uuid.New().String(), uuid.New().String()),
 	}
 	b, err := json.Marshal(val)
 	if err != nil {
@@ -143,7 +144,7 @@ func putKv(c pb.DrpcServiceClient, ctx context.Context, n int32) int32 {
 	}
 	putKvRequest := &pb.PutKvReq{
 		SchemaName: fmt.Sprintf("schema-%d", i),
-		Key:        fmt.Sprintf("key-%d", i),
+		Key:        fmt.Sprintf("key-%d-%s", i, uuid.New().String()),
 		Value:      string(b),
 	}
 	// createRequest
@@ -166,7 +167,7 @@ func getKv(c pb.DrpcServiceClient, ctx context.Context, n int32) int32 {
 
 	getKvRequest := &pb.GetKvReq{
 		SchemaName: fmt.Sprintf("schema-%d", i),
-		Key:        fmt.Sprintf("key-%d", i),
+		Key:        fmt.Sprintf("key-%d-%s", i, uuid.New().String()),
 	}
 	// createRequest
 	body, _ := proto.Marshal(getKvRequest)
@@ -187,7 +188,7 @@ func delKv(c pb.DrpcServiceClient, ctx context.Context, n int32) int32 {
 	i := rand.Int31n(n)
 	delKvRequest := &pb.DelKvReq{
 		SchemaName: fmt.Sprintf("schema-%d", i),
-		Key:        fmt.Sprintf("key-%d", i),
+		Key:        fmt.Sprintf("key-%d-%s", i, uuid.New().String()),
 	}
 	// createRequest
 	body, _ := proto.Marshal(delKvRequest)
@@ -233,34 +234,46 @@ func main() {
 			break
 		}
 	}
-	go func(mp map[string]*OpMetric, index int) {
+	done := make(chan struct{})
+	go func(mp map[string]*OpMetric, index int, done chan struct{}) {
 		ticker := time.NewTicker(time.Duration(1) * time.Second)
 		defer ticker.Stop()
 		for {
+			var metric *OpMetric
 			select {
+			case <-done:
+				return
 			case <-ticker.C:
 				if specOpIndex <= 0 {
 					for _, v := range opTypes {
 						opName := opMap[v]
-						metric := metricMap[opName]
-						log.Infof("%s: total=%d,succ=%d,failed=%d\n", opName, metric.Total, metric.Succ, metric.Fail)
+						metric = metricMap[opName]
+						if metric.Succ > 0 {
+							log.Infof("%s: total=%d,succ=%d,failed=%d,qps=%v\n", opName, metric.Total, metric.Succ, metric.Fail, metric.Succ/uint64(metric.ElapseSeconds))
+
+						}
 					}
+					log.Info("\n")
 				} else {
 					opName := opMap[specOpIndex]
-					metric := metricMap[opName]
-					log.Infof("%s: total=%d,succ=%d,failed=%d\n", opName, metric.Total, metric.Succ, metric.Fail)
+					metric = metricMap[opName]
+					if metric.Succ > 0 {
+						log.Infof("%s: total=%d,succ=%d,failed=%d,qps=%v\n", opName, metric.Total, metric.Succ, metric.Fail, metric.Succ/uint64(metric.ElapseSeconds))
+					}
+					log.Info("\n")
 				}
 			}
 		}
-	}(metricMap, specOpIndex)
+	}(metricMap, specOpIndex, done)
 
 	var index int
+	start := time.Now()
 	for {
 		select {
 		case <-ticker.C:
 			for i := 0; i < *count; i++ {
 				if specOpIndex == -1 {
-					index = int(rand.Int31() % int32(len(opTypes)))
+					index = opTypes[int(rand.Int31()%int32(len(opTypes)))]
 				} else {
 					index = specOpIndex
 				}
@@ -283,13 +296,17 @@ func main() {
 
 				}
 				atomic.AddUint64(&metricMap[opMap[opTypeIndex]].Total, 1)
-				if ret < 0 {
-					atomic.AddUint64(&metricMap[opMap[opTypeIndex]].Succ, 1)
-				} else {
+				if ret != 0 {
 					atomic.AddUint64(&metricMap[opMap[opTypeIndex]].Fail, 1)
+				} else {
+					atomic.AddUint64(&metricMap[opMap[opTypeIndex]].Succ, 1)
 				}
+
+				metricMap[opMap[opTypeIndex]].ElapseSeconds = time.Since(start).Seconds()
+
 			}
 		case <-sigs:
+			done <- struct{}{}
 			log.Info("stop benckmark....")
 			return
 		}
