@@ -17,7 +17,7 @@ typedef struct
   bool is_active;
 } schema_meta_rec_t;
 
-#define SYS_SCHEMA_META_TABLE_NAME "sys_schema_meta"
+static char *SYS_SCHEMA_META_TABLE_NAME="sys_schema_meta";
 int schmea_meta_rec_assign(schema_meta_rec_t *meta,uint32_t key_count,bool is_active,uint64_t bytes);
 int schmea_meta_rec_swap(schema_meta_rec_t *src,schema_meta_rec_t *dst);
 

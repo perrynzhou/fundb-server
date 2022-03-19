@@ -24,8 +24,6 @@ static void dbservice_get_kv(Drpc__Request *drpc_req, Drpc__Response *drpc_resp,
   struct drpc_alloc alloc = PROTO_ALLOCATOR_INIT(alloc);
   Dbservice__GetKvReq *req = (Dbservice__GetKvReq *)dbervice_request_alloc(drpc_req, &alloc.alloc);
   Dbservice__GetKvResp resp = DBSERVICE__GET_KV_RESP__INIT;
-  log_info("*******************dbservice_get_kv**************");
-  log_info("request schmea=%s,key=%s", req->schema_name, req->key);
   char msg_buf[2048] = {'\0'};
   resp.code = -1;
   resp.msg = (char *)&msg_buf;
@@ -56,10 +54,11 @@ static void dbservice_del_kv(Drpc__Request *drpc_req, Drpc__Response *drpc_resp,
   struct drpc_alloc alloc = PROTO_ALLOCATOR_INIT(alloc);
   Dbservice__DelKvReq *req = (Dbservice__DelKvReq *)dbervice_request_alloc(drpc_req, &alloc.alloc);
   Dbservice__DelKvResp resp = DBSERVICE__DEL_KV_RESP__INIT;
-  log_info("dbservice_del_kv: schmea=%s,key=%s", req->schema_name, req->key);
   char msg_buf[2048] = {'\0'};
   resp.code = -1;
-  resp.msg = (char *)&msg_buf;
+  size_t key_size = strlen(req->key);
+  schema_meta_rec_t *last_meta = NULL;
+  size_t value_size = -1;
   schema_meta_rec_t *meta = (schema_meta_rec_t *)dict_get(db->schmea_meta_cache, req->schema_name);
   if (meta == NULL)
   {
@@ -68,15 +67,12 @@ static void dbservice_del_kv(Drpc__Request *drpc_req, Drpc__Response *drpc_resp,
     goto out;
   }
 
-  size_t key_size = strlen(req->key);
   if (kv_db_search(db, req->schema_name, req->key, key_size) != 0)
   {
     snprintf((char *)&msg_buf, 2048, "failed: key %s  not found", req->key);
     goto out;
   }
-  size_t bytes = strlen(req->key);
-  schema_meta_rec_t *last_meta = schmea_meta_rec_fetch(SYS_SCHEMA_META_TABLE_NAME, req->schema_name, db);
-  size_t value_size = -1;
+  last_meta = schmea_meta_rec_fetch(SYS_SCHEMA_META_TABLE_NAME, req->schema_name, db);
   kv_db_get(db, req->schema_name, req->key, key_size, &value_size);
   __sync_fetch_and_sub(&last_meta->kv_count, 1);
   __sync_fetch_and_sub(&last_meta->bytes, value_size + key_size);
@@ -88,9 +84,12 @@ static void dbservice_del_kv(Drpc__Request *drpc_req, Drpc__Response *drpc_resp,
     schmea_meta_rec_save(SYS_SCHEMA_META_TABLE_NAME, req->schema_name, last_meta, sizeof(*last_meta), db);
     resp.code = kv_db_del(db, req->schema_name, req->key, key_size);
   }
+  resp.code = 0;
   snprintf((char *)&msg_buf, 2048, "succ: del key %s  ok,value size=%ld", req->key, value_size);
-
 out:
+  resp.msg = (char *)&msg_buf;
+  log_info("******dbservice_del_kv: schmea=%s,ret=%d,msg=%s*********", req->schema_name, resp.code, resp.msg);
+  log_info("******dbservice_del_kv: key=%s,value_size=%d*********", req->key, value_size);
   dbservice_finish_response(drpc_req, drpc_resp, req, &resp, &alloc.alloc);
 }
 
@@ -103,27 +102,29 @@ static void dbservice_put_kv(Drpc__Request *drpc_req, Drpc__Response *drpc_resp,
   char msg_buf[2048] = {'\0'};
   schema_meta_rec_t *meta = (schema_meta_rec_t *)dict_get(db->schmea_meta_cache, req->schema_name);
   resp.code = -1;
+
+  size_t bytes = 0;
+  schema_meta_rec_t *last_meta = NULL;
+  size_t key_size = strlen(req->key);
+  size_t value_size = strlen(req->value);
   if (meta == NULL)
   {
     snprintf((char *)&msg_buf, 2048, "failed: schema %s not found", req->schema_name);
     goto out;
   }
 
-  size_t key_size = strlen(req->key);
-  size_t value_size = strlen(req->value);
   if (kv_db_search(db, req->schema_name, req->key, key_size) == 0)
   {
     snprintf((char *)&msg_buf, 2048, "failed: key %s  exists", req->key);
     goto out;
   }
 
-  size_t bytes = strlen(req->key) + strlen(req->value);
-  schema_meta_rec_t *last_meta = schmea_meta_rec_fetch(SYS_SCHEMA_META_TABLE_NAME, req->schema_name, db);
+  bytes = strlen(req->key) + strlen(req->value);
+  last_meta = schmea_meta_rec_fetch(SYS_SCHEMA_META_TABLE_NAME, req->schema_name, db);
   __sync_fetch_and_add(&last_meta->kv_count, 1);
   __sync_fetch_and_add(&last_meta->bytes, bytes);
   {
     pthread_mutex_lock(&db->lock);
-    log_info("schema =%s,key_count=%d,bytes=%d", req->schema_name, last_meta->kv_count, last_meta->bytes);
     if (kv_db_set(db, req->schema_name, req->key, key_size, req->value, value_size) != -1)
     {
       schmea_meta_rec_swap(meta, last_meta);
@@ -135,10 +136,8 @@ static void dbservice_put_kv(Drpc__Request *drpc_req, Drpc__Response *drpc_resp,
   snprintf((char *)&msg_buf, 2048, "succ: %s put key %s  ok", req->schema_name, req->key);
 out:
   resp.msg = (char *)&msg_buf;
-  if(resp.code !=0) {
-    log_error("error msg=%s",resp.msg);
-  }
-  log_info("dbservice_put_kv ret=%d::request schmea=%s,key=%s,val=%s", resp.code, req->schema_name, req->key, req->value);
+  log_info("******dbservice_put_kv: schmea=%s,ret=%d,msg=%s*********", req->schema_name, resp.code, resp.msg);
+  log_info("******dbservice_put_kv: key=%s,value=%s*********", req->key, req->value);
   dbservice_finish_response(drpc_req, drpc_resp, req, &resp, &alloc.alloc);
 }
 
@@ -151,6 +150,8 @@ static void dbservice_create_schema(Drpc__Request *drpc_req, Drpc__Response *drp
   log_info("request schmea_name=%s", req->name);
   char msg_buf[2048] = {'\0'};
   schema_meta_rec_t *meta = (schema_meta_rec_t *)dict_get(db->schmea_meta_cache, req->name);
+  kv_schema_t *schema = NULL;
+  schema_meta_rec_t *cur_meta = NULL;
   resp.code = -1;
 
   if (meta != NULL)
@@ -159,9 +160,9 @@ static void dbservice_create_schema(Drpc__Request *drpc_req, Drpc__Response *drp
     goto out;
   }
 
-  kv_schema_t *schema = kv_schema_alloc(req->name, db, false);
+  schema = kv_schema_alloc(req->name, db, false);
   assert(schema != NULL);
-  schema_meta_rec_t *cur_meta = calloc(1, sizeof(*cur_meta));
+  cur_meta = (schema_meta_rec_t *)calloc(1, sizeof(*cur_meta));
   assert(cur_meta != NULL);
   {
     pthread_mutex_lock(&db->lock);
@@ -179,6 +180,7 @@ static void dbservice_create_schema(Drpc__Request *drpc_req, Drpc__Response *drp
   snprintf((char *)&msg_buf, 2048, "failed:init schema  %s ctx", req->name);
 out:
   resp.msg = (char *)&msg_buf;
+  log_info("******dbservice_create_schema: schmea=%s,ret=%d,msg=%s*********", req->name, resp.code, resp.msg);
   dbservice_finish_response(drpc_req, drpc_resp, req, &resp, &alloc.alloc);
 }
 
@@ -188,7 +190,6 @@ static void dbservice_drop_schema(Drpc__Request *drpc_req, Drpc__Response *drpc_
   struct drpc_alloc alloc = PROTO_ALLOCATOR_INIT(alloc);
   Dbservice__DropSchemaReq *req = (Dbservice__DropSchemaReq *)dbervice_request_alloc(drpc_req, &alloc.alloc);
   Dbservice__DropSchemaResp resp = DBSERVICE__DROP_SCHEMA_RESP__INIT;
-  log_info("drop schmea_name=%s", req->name);
   schema_meta_rec_t *meta = (schema_meta_rec_t *)dict_get(db->schmea_meta_cache, req->name);
   char msg_buf[2048] = {'\0'};
   resp.code = -1;
@@ -211,6 +212,7 @@ static void dbservice_drop_schema(Drpc__Request *drpc_req, Drpc__Response *drpc_
   resp.name = req->name;
 out:
   resp.msg = (char *)&msg_buf;
+  log_info("******dbservice_drop_schema: schmea=%s,ret=%d,msg=%s*********", req->name, resp.code, resp.msg);
   dbservice_finish_response(drpc_req, drpc_resp, req, &resp, &alloc);
 }
 
@@ -220,7 +222,6 @@ static void dbservice_query_schema_meta(Drpc__Request *drpc_req, Drpc__Response 
   struct drpc_alloc alloc = PROTO_ALLOCATOR_INIT(alloc);
   Dbservice__QuerySchemaReq *req = (Dbservice__QuerySchemaReq *)dbervice_request_alloc(drpc_req, &alloc.alloc);
   Dbservice__QuerySchemaResp resp = DBSERVICE__QUERY_SCHEMA_RESP__INIT;
-  log_info("dbservice_query_schema_meta: schmea_name=%s", req->name);
   schema_meta_rec_t *meta = (schema_meta_rec_t *)dict_get(db->schmea_meta_cache, req->name);
   char msg_buf[2048] = {'\0'};
   resp.code = -1;
@@ -243,6 +244,11 @@ static void dbservice_query_schema_meta(Drpc__Request *drpc_req, Drpc__Response 
   resp.meta = schmea_meta_rec_dump(meta);
 out:
   resp.msg = (char *)&msg_buf;
+  log_info("******dbservice_query_schema_meta: schmea=%s,ret=%d,msg=%s*********", req->name, resp.code, resp.msg);
+  if (meta != NULL)
+  {
+    log_info("******dbservice_query_schema_meta: key_count=%d,bytes=%ld,is_active=%d*********", meta->kv_count, meta->bytes, meta->is_active);
+  }
   dbservice_finish_response(drpc_req, drpc_resp, req, &resp, &alloc);
 }
 void process_drpc_request(Drpc__Request *drpc_req, Drpc__Response *drpc_resp, void *ctx)
