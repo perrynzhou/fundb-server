@@ -2,6 +2,8 @@
     "files.associations": {
         "kv.pb-c.h": "c",
         "drpc.h": "c",
-        "log.h": "c"
+        "log.h": "c",
+        "schmea_meta.h": "c",
+        "dbservice_help.h": "c"
     }
 }
