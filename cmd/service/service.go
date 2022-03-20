@@ -33,7 +33,7 @@ func init() {
 
 func main() {
 	flag.Parse()
-	cf, err := conf.NewConf(*confFile)
+	cf, err := conf.NewBackendConf(*confFile)
 	if err != nil {
 		return
 	}
