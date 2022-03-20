@@ -284,7 +284,7 @@ func main() {
 		},
 	}
 
-	app.Name = "fundb_cli"
+	app.Name = "dbcli"
 	app.Usage = ""
 	app.Description = "fundb_cli for fundbserver"
 	app.Version = "v1.0.1"
