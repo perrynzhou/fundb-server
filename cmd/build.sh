@@ -4,3 +4,5 @@ go build -o  dbserver service/service.go
 go build -o  dbclient  client/client.go
 go build -o  dbench  bench/bench.go
 go build -o dbclient_thin  thin-client/client.go
+
+go build -o dbcli  shell/client.go
