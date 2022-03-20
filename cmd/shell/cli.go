@@ -187,7 +187,7 @@ func main() {
 			Subcommands: []cli.Command{
 				{
 					Name:  "add",
-					Usage: "add a new schema",
+					Usage: "schema add {schema_name}",
 					Action: func(c *cli.Context) error {
 						resp, err := createSchmea(rpcClient, ctx, c.Args().First())
 						if err != nil {
@@ -200,7 +200,7 @@ func main() {
 				},
 				{
 					Name:  "del",
-					Usage: "del a schema",
+					Usage: "schema del {schema_name}",
 					Action: func(c *cli.Context) error {
 						resp, err := dropSchmea(rpcClient, ctx, c.Args().First())
 						if err != nil {
@@ -213,7 +213,7 @@ func main() {
 				},
 				{
 					Name:  "fetch",
-					Usage: "feth a schema meta",
+					Usage: "schema fetch {schema_name}",
 					Action: func(c *cli.Context) error {
 						resp, err := querySchmea(rpcClient, ctx, c.Args().First())
 						if err != nil {
@@ -235,7 +235,7 @@ func main() {
 			Subcommands: []cli.Command{
 				{
 					Name:  "add",
-					Usage: "add a for data in schema ",
+					Usage: "kv add {schema_name} {key} {value}",
 					Action: func(c *cli.Context) error {
 						schmeaName := c.Args().Get(0)
 						Key := c.Args().Get(1)
@@ -251,7 +251,7 @@ func main() {
 				},
 				{
 					Name:  "del",
-					Usage: "remove a data from schema",
+					Usage: "kv del {schema_name} {key}",
 					Action: func(c *cli.Context) error {
 						schmeaName := c.Args().Get(0)
 						Key := c.Args().Get(1)
@@ -267,7 +267,7 @@ func main() {
 				},
 				{
 					Name:  "get",
-					Usage: "get a data from schema",
+					Usage: "kv get {schema_name} {key}",
 					Action: func(c *cli.Context) error {
 						schmeaName := c.Args().Get(0)
 						Key := c.Args().Get(1)
