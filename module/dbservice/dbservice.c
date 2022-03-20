@@ -153,7 +153,6 @@ static void dbservice_create_schema(Drpc__Request *drpc_req, Drpc__Response *drp
   kv_schema_t *schema = NULL;
   schema_meta_rec_t *cur_meta = NULL;
   resp.code = -1;
-
   if (meta != NULL)
   {
     snprintf((char *)&msg_buf, 2048, "failed: schema %s  exists", req->name);
@@ -247,6 +246,7 @@ out:
   log_info("******dbservice_query_schema_meta: schmea=%s,ret=%d,msg=%s*********", req->name, resp.code, resp.msg);
   if (meta != NULL)
   {
+    log_info("******dbservice_query_schema_meta: meta=%s*********",resp.meta);
     log_info("******dbservice_query_schema_meta: key_count=%d,bytes=%ld,is_active=%d*********", meta->kv_count, meta->bytes, meta->is_active);
   }
   dbservice_finish_response(drpc_req, drpc_resp, req, &resp, &alloc);

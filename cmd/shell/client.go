@@ -2,16 +2,18 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"fundb-server/conf"
 	"fundb-server/drpc/pb"
+	"os"
+	"time"
+
 	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/protobuf/proto"
-	"os"
-	"time"
 )
 
 const (
@@ -25,7 +27,7 @@ const (
 )
 
 const (
-	defaultCliConfFile = "./.cli_conf.json"
+	defaultCliConfFile = "./.shell_conf.json"
 )
 
 func querySchmea(c pb.DrpcServiceClient, ctx context.Context, schemaName string) (*pb.QuerySchemaResp, error) {
@@ -194,7 +196,8 @@ func main() {
 							log.Error(err)
 							return err
 						}
-						log.Info(resp)
+						b, _ := json.Marshal(resp)
+						fmt.Println(string(b))
 						return nil
 					},
 				},
@@ -207,7 +210,8 @@ func main() {
 							log.Error(err)
 							return err
 						}
-						log.Info(resp)
+						b, _ := json.Marshal(resp)
+						fmt.Println(string(b))
 						return nil
 					},
 				},
@@ -220,7 +224,8 @@ func main() {
 							log.Error(err)
 							return err
 						}
-						log.Info(resp)
+						b, _ := json.Marshal(resp)
+						fmt.Println(string(b))
 						return nil
 					},
 				},
@@ -245,7 +250,8 @@ func main() {
 							log.Error(err)
 							return err
 						}
-						log.Info(resp)
+						b, _ := json.Marshal(resp)
+						fmt.Println(string(b))
 						return nil
 					},
 				},
@@ -260,7 +266,8 @@ func main() {
 							log.Error(err)
 							return err
 						}
-						log.Info(resp)
+						b, _ := json.Marshal(resp)
+						fmt.Println(string(b))
 						return nil
 
 					},
@@ -276,7 +283,8 @@ func main() {
 							log.Error(err)
 							return err
 						}
-						log.Info(resp)
+						b, _ := json.Marshal(resp)
+						fmt.Println(string(b))
 						return nil
 					},
 				},

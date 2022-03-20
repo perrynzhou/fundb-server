@@ -86,6 +86,6 @@ char *schmea_meta_rec_dump(schema_meta_rec_t* rec)
   json_object_set(obj, "total_bytes", json_integer(rec->bytes));
   int is_active = (rec->is_active)?1:0;
   json_object_set(obj, "is_active",json_integer(is_active));
-  return json_dumps(obj,0);
+  return json_dumps(obj,JSON_ENCODE_ANY);
 }
 
