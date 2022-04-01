@@ -11,6 +11,7 @@
 #include <jansson.h>
 #include "kv_db.h"
 #include "dict.h"
+#include "bitmap.h"
 #include "log.h"
 #include "schmea_meta.h"
 #define SCHEMA_MAX_SIZE (65535)
@@ -43,6 +44,8 @@ static int schema_cache_load_cb(void *ctx,void *key,void *val)
   log_info("reload schmea=%s",schema->uri);
   schema_meta_rec_t *prev_meta = schmea_meta_rec_fetch(SYS_SCHEMA_META_TABLE_NAME,(char *)key, db);
   schema_meta_rec_t *new_meta = (schema_meta_rec_t *)calloc(1,sizeof(schema_meta_rec_t));
+ new_meta->bitmap  = bitmap_alloc(UINT32_MAX>>4);
+
   schmea_meta_rec_assign(new_meta,prev_meta->kv_count,prev_meta->is_active,prev_meta->bytes);
   dict_put(db->schmea_meta_cache,(char *)key,new_meta);
   log_info("cache::load key=%s,count=%d,active=%d",(char *)key,prev_meta->kv_count,prev_meta->is_active);

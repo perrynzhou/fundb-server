@@ -10,11 +10,14 @@
 #include <stdio.h>
 #include "kv_db.h"
 #include "dict.h"
+#include "bitmap.h"
+
 typedef struct
 {
   uint32_t kv_count;
   uint64_t bytes;
   bool is_active;
+  bitmap_t *bitmap;
 } schema_meta_rec_t;
 
 static char *SYS_SCHEMA_META_TABLE_NAME="sys_schema_meta";

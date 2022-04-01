@@ -1,0 +1,6 @@
+make --dry-run --keep-going --print-directory
+make: Entering directory '/home/perrynzhou/source/perrynzhou/fundb-server'
+make: Leaving directory '/home/perrynzhou/source/perrynzhou/fundb-server'
+ 
+make: *** No targets specified and no makefile found.  Stop.
+
